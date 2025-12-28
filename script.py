@@ -48,10 +48,17 @@ class Hero(arcade.Sprite):
         self.texture = self.walk_down[0]
         self.direction = "down"
 
+        self.shoot_timer = 0
+        self.shoot_cooldown = 0.5
+
        
-    def update(self, keys_pressed, delta_time):
+    def update(self, keys_pressed, delta_time, bullets):
         self.keys_pressed = keys_pressed
         moving = False
+
+        if self.shoot_timer > 0:
+            self.shoot_timer -= delta_time
+
 
         if arcade.key.W in self.keys_pressed:
             self.center_y += self.speed * delta_time
@@ -70,6 +77,35 @@ class Hero(arcade.Sprite):
             self.center_x -= self.speed * delta_time
             moving = True
             self.direction = "left"
+
+        if arcade.key.UP in self.keys_pressed and self.shoot_timer <= 0:
+            bullet = Bullet("up")
+            bullet.center_x = self.center_x
+            bullet.center_y = self.center_y
+            bullets.append(bullet)
+            
+            self.shoot_timer = self.shoot_cooldown
+        if arcade.key.DOWN in self.keys_pressed and self.shoot_timer <= 0:
+            bullet = Bullet("down")
+            bullet.center_x = self.center_x
+            bullet.center_y = self.center_y
+            bullets.append(bullet)
+
+            self.shoot_timer = self.shoot_cooldown
+        if arcade.key.RIGHT in self.keys_pressed and self.shoot_timer <= 0:
+            bullet = Bullet("right")
+            bullet.center_x = self.center_x
+            bullet.center_y = self.center_y
+            bullets.append(bullet)
+            self.shoot_timer = self.shoot_cooldown
+        if arcade.key.LEFT in self.keys_pressed and self.shoot_timer <= 0:
+            bullet = Bullet("left")
+            bullet.center_x = self.center_x
+            bullet.center_y = self.center_y
+            bullets.append(bullet)
+            self.shoot_timer = self.shoot_cooldown
+        
+
 
 
         if moving:
@@ -99,7 +135,33 @@ class Hero(arcade.Sprite):
                 self.texture = self.walk_left[0]
         
 
+class Bullet(arcade.Sprite):
+    def __init__(self, direction):
+        super().__init__()
 
+        self.texture = arcade.load_texture("assets/bullet.png")
+        self.direction = direction
+        self.speed = 500
+
+    def update(self, delta_time):
+        if self.direction == "right":
+            self.center_x += self.speed * delta_time
+        elif self.direction == "left":
+            self.center_x -= self.speed * delta_time
+        elif self.direction == "up":
+            self.center_y += self.speed * delta_time
+        elif self.direction == "down":
+            self.center_y -= self.speed * delta_time
+
+        if (
+            self.right < 0 or
+            self.left > SCREEN_WIDTH or
+            self.top < 0 or
+            self.bottom > SCREEN_HEIGHT
+        ):
+            self.remove_from_sprite_lists()
+
+        
 
 
 class MyGame(arcade.Window):
@@ -110,6 +172,8 @@ class MyGame(arcade.Window):
         self.player_list = arcade.SpriteList()
         self.player = Hero()
         self.player_list.append(self.player)
+
+        self.bullets = arcade.SpriteList()
         
 
     def setup(self):
@@ -118,9 +182,11 @@ class MyGame(arcade.Window):
     def on_draw(self):
         self.clear()
         self.player_list.draw()
+        self.bullets.draw()
 
     def on_update(self, delta_time):
-        self.player.update(self.keys_pressed, delta_time)
+        self.player.update(self.keys_pressed, delta_time, self.bullets)
+        self.bullets.update(delta_time)
 
     def on_mouse_press(self, x, y, button, modifiers):
         pass
