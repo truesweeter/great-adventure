@@ -110,6 +110,16 @@ class Hero(arcade.Sprite):
             bullets.append(bullet)
             self.shoot_timer = self.shoot_cooldown
         
+        #не дает пройти персонажу за окно
+        if self.center_x <= 0:
+            self.center_x = 0
+        if self.center_x >= SCREEN_WIDTH:
+            self.center_x = SCREEN_WIDTH
+        if self.center_y <= 0:
+            self.center_y = 0
+        if self.center_y >= SCREEN_HEIGHT:
+            self.center_y = SCREEN_HEIGHT
+        
 
 
 
@@ -171,9 +181,11 @@ class EnemyBeatle(arcade.Sprite):
     def __init__(self, target):
         super().__init__()
         self.target = target
-
+        
+        self.is_dead = False
         self.attack = True
 
+        self.timer = 0
         self.speed = 200
         self.animation_timer = 0
         self.current_texture = 0
@@ -217,11 +229,26 @@ class EnemyBeatle(arcade.Sprite):
                     self.current_texture = 0
                 self.texture = self.walk_animation[self.current_texture]
             
-            if self.target.center_x < self.center_x:
-                self.scale_x = -abs(self.scale_x)
-            else:
-                self.scale_x = abs(self.scale_x)
-    
+            if not self.is_dead:
+                if self.target.center_x < self.center_x:
+                    self.scale_x = -abs(self.scale_x)
+                else:
+                    self.scale_x = abs(self.scale_x)
+        
+        if self.is_dead:
+            self.speed = 0
+            self.animation_timer += 1
+
+            if self.animation_timer % 8 == 0:
+                self.current_texture += 1
+
+                if self.current_texture < len(self.death_animation):
+                    self.texture = self.death_animation[self.current_texture]
+
+            self.timer += delta_time
+            if self.timer >= 8:
+                self.timer = 0
+                self.remove_from_sprite_lists()
 
 
 
@@ -256,24 +283,40 @@ class MyGame(arcade.Window):
 
         #спавн жуков
         self.timer += delta_time
-        if self.timer >= 3:
-            self.timer = 0
-            enemy = EnemyBeatle(self.player)
-            position = random.randint(0, 1)
-            if position == 0:
-                enemy.center_y = random.randint(0, SCREEN_HEIGHT)
-                enemy.center_x = random.choice([0, SCREEN_WIDTH])
+        if self.timer >= 1:
+            spawn = random.choice([True, False, False, False]) #шанс на спавн 25%
+            if spawn:
+                self.timer = 0
+                enemy = EnemyBeatle(self.player)
+                position = random.randint(0, 1)
+                if position == 0:
+                    enemy.center_y = random.randint(0, SCREEN_HEIGHT)
+                    enemy.center_x = random.choice([0, SCREEN_WIDTH])
+                else:
+                    enemy.center_x = random.randint(0, SCREEN_WIDTH)
+                    enemy.center_y = random.choice([0, SCREEN_HEIGHT])
+                self.enemies.append(enemy)
             else:
-                enemy.center_x = random.randint(0, SCREEN_WIDTH)
-                enemy.center_y = random.choice([0, SCREEN_HEIGHT])
-            self.enemies.append(enemy)
+                pass
         
         #попадение выстрела в жука
         for bullet in self.bullets:
             hit_list = arcade.check_for_collision_with_list(bullet, self.enemies)
             for enemy in hit_list:
-                enemy.remove_from_sprite_lists()
-                bullet.remove_from_sprite_lists()
+                if not enemy.is_dead:
+                    bullet.remove_from_sprite_lists()
+                if not enemy.is_dead:
+                    enemy.is_dead = True
+                    enemy.animation_timer = 0
+                    enemy.current_texture = 0
+                    enemy.texture = enemy.death_animation[0]
+
+        #смерть героя
+        hit_list = arcade.check_for_collision_with_list(self.player, self.enemies)
+        for enemy in hit_list:
+            if not enemy.is_dead:
+                arcade.exit()
+                
 
     def on_mouse_press(self, x, y, button, modifiers):
         pass
@@ -286,7 +329,7 @@ class MyGame(arcade.Window):
 
 def main():
     game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    game.setup()  # Запускаем начальную настройку игры
+    game.setup()
     arcade.run()
 
 
