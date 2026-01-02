@@ -1,4 +1,7 @@
 import arcade
+import math 
+import random
+
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 720
@@ -50,6 +53,8 @@ class Hero(arcade.Sprite):
 
         self.shoot_timer = 0
         self.shoot_cooldown = 0.5
+
+        
 
        
     def update(self, keys_pressed, delta_time, bullets):
@@ -162,6 +167,62 @@ class Bullet(arcade.Sprite):
             self.remove_from_sprite_lists()
 
         
+class EnemyBeatle(arcade.Sprite):
+    def __init__(self, target):
+        super().__init__()
+        self.target = target
+
+        self.attack = True
+
+        self.speed = 200
+        self.animation_timer = 0
+        self.current_texture = 0
+        self.walk_animation = [
+            arcade.load_texture("assets/enemy1/walk0.png"),
+            arcade.load_texture("assets/enemy1/walk1.png"),
+            arcade.load_texture("assets/enemy1/walk2.png"),
+            arcade.load_texture("assets/enemy1/walk3.png")
+        ]
+        self.death_animation = [
+            arcade.load_texture("assets/enemy1/death0.png"),
+            arcade.load_texture("assets/enemy1/death1.png"),
+            arcade.load_texture("assets/enemy1/death2.png"),
+            arcade.load_texture("assets/enemy1/death3.png"),
+            arcade.load_texture("assets/enemy1/death4.png"),
+            arcade.load_texture("assets/enemy1/death5.png"),
+            arcade.load_texture("assets/enemy1/death6.png"),
+        ]
+        self.texture = self.walk_animation[0]
+
+    
+    def update(self, delta_time):
+        if self.attack:
+            dx = self.target.center_x - self.center_x
+            dy = self.target.center_y - self.center_y
+
+            distance = math.hypot(dx, dy)
+
+            if distance > 0:
+                dx /= distance
+                dy /= distance
+
+                self.center_x += dx * self.speed * delta_time
+                self.center_y += dy * self.speed * delta_time
+
+            self.animation_timer += 1
+
+            if self.animation_timer % 8 == 0:
+                self.current_texture += 1
+                if self.current_texture >= len(self.walk_animation):
+                    self.current_texture = 0
+                self.texture = self.walk_animation[self.current_texture]
+            
+            if self.target.center_x < self.center_x:
+                self.scale_x = -abs(self.scale_x)
+            else:
+                self.scale_x = abs(self.scale_x)
+    
+
 
 
 class MyGame(arcade.Window):
@@ -174,19 +235,45 @@ class MyGame(arcade.Window):
         self.player_list.append(self.player)
 
         self.bullets = arcade.SpriteList()
+        self.enemies = arcade.SpriteList()
         
 
     def setup(self):
         self.keys_pressed = set()
+        self.timer = 0
 
     def on_draw(self):
         self.clear()
         self.player_list.draw()
         self.bullets.draw()
+        self.enemies.draw()
 
     def on_update(self, delta_time):
         self.player.update(self.keys_pressed, delta_time, self.bullets)
         self.bullets.update(delta_time)
+        self.enemies.update(delta_time)
+
+
+        #спавн жуков
+        self.timer += delta_time
+        if self.timer >= 3:
+            self.timer = 0
+            enemy = EnemyBeatle(self.player)
+            position = random.randint(0, 1)
+            if position == 0:
+                enemy.center_y = random.randint(0, SCREEN_HEIGHT)
+                enemy.center_x = random.choice([0, SCREEN_WIDTH])
+            else:
+                enemy.center_x = random.randint(0, SCREEN_WIDTH)
+                enemy.center_y = random.choice([0, SCREEN_HEIGHT])
+            self.enemies.append(enemy)
+        
+        #попадение выстрела в жука
+        for bullet in self.bullets:
+            hit_list = arcade.check_for_collision_with_list(bullet, self.enemies)
+            for enemy in hit_list:
+                enemy.remove_from_sprite_lists()
+                bullet.remove_from_sprite_lists()
 
     def on_mouse_press(self, x, y, button, modifiers):
         pass
