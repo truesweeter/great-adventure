@@ -252,10 +252,12 @@ class EnemyBeatle(arcade.Sprite):
 
 
 
-class MyGame(arcade.Window):
-    def __init__(self, width, height, title):
-        super().__init__(width, height, title)
+class GameView(arcade.View):
+    def __init__(self):
+        super().__init__()
         arcade.set_background_color(arcade.color.ASH_GREY)
+        self.keys_pressed = []
+        self.timer = 0
 
         self.player_list = arcade.SpriteList()
         self.player = Hero()
@@ -271,9 +273,9 @@ class MyGame(arcade.Window):
 
     def on_draw(self):
         self.clear()
-        self.player_list.draw()
         self.bullets.draw()
         self.enemies.draw()
+        self.player_list.draw()
 
     def on_update(self, delta_time):
         self.player.update(self.keys_pressed, delta_time, self.bullets)
@@ -315,22 +317,109 @@ class MyGame(arcade.Window):
         hit_list = arcade.check_for_collision_with_list(self.player, self.enemies)
         for enemy in hit_list:
             if not enemy.is_dead:
-                arcade.exit()
+                death_view = DeathView()
+                self.window.show_view(death_view)
                 
 
     def on_mouse_press(self, x, y, button, modifiers):
         pass
 
     def on_key_press(self, key, modifiers):
-        self.keys_pressed.add(key)
+        self.keys_pressed.append(key)
         
+    def on_key_release(self, key, modifiers):
+        if key in self.keys_pressed:
+            self.keys_pressed.remove(key)
+
+
+class StartView(arcade.View):
+    def __init__(self):
+        super().__init__()
+        self.keys_pressed = []
+        self.logo_list = arcade.SpriteList()
+        logo = arcade.Sprite("assets/logo.png")
+        logo.scale = 0.3
+        self.logo_list.append(logo)
+        logo.center_x = SCREEN_WIDTH / 2
+        logo.center_y = SCREEN_HEIGHT / 2 + 100
+        arcade.set_background_color(arcade.color.BLACK)
+        
+    
+    def on_draw(self):
+        self.clear()
+        self.logo_list.draw()
+        arcade.draw_text("Для начала игры нажмите любую клавишу", SCREEN_WIDTH / 2 - 275, SCREEN_HEIGHT / 2 - 200, font_size=17, font_name="Minecraft Rus")
+    
+    def on_key_press(self, key, modifiers):
+        self.keys_pressed.append(key)
+    
+    def on_update(self, delta_time):
+        if self.keys_pressed:
+            game_view = GameView()
+            self.window.show_view(game_view)
+        
+
+class DeathView(arcade.View):
+    def __init__(self):
+        super().__init__()
+        skull = arcade.Sprite("assets/skull.png")
+        skull.center_x = SCREEN_WIDTH / 2
+        skull.center_y = SCREEN_HEIGHT / 2 + 100
+        self.all_sprites = arcade.SpriteList()
+        self.all_sprites.append(skull)
+        arcade.set_background_color(arcade.color.GRAY_BLUE)
+        self.keys_pressed = []
+
+        #cтрелка выбора
+        self.arrow_y = [SCREEN_HEIGHT / 2 - 170, SCREEN_HEIGHT / 2 - 220]
+        self.arrow_pick = "UP"
+        self.arrow = arcade.Sprite("assets/arrow.png")
+        self.arrow.scale = 0.35
+        self.arrow.center_x = SCREEN_WIDTH / 2 - 230
+        self.arrow.center_y = SCREEN_HEIGHT / 2 - 175
+        self.all_sprites.append(self.arrow)
+        
+    
+    def on_draw(self):
+        self.clear()
+        self.all_sprites.draw()
+        arcade.draw_text("Вы умерли! Желаете начать заново?", SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 - 100, font_name="Minecraft Rus", font_size=17)
+        
+        arcade.draw_text("Да, начать новую игру", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 - 175, font_name="Minecraft Rus", font_size=15)
+        arcade.draw_text("Нет, выйти из игры", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 - 225, font_name="Minecraft Rus", font_size=15)
+
+    def on_update(self, delta_time):
+        if arcade.key.UP in self.keys_pressed:
+            self.arrow_pick = "UP"
+        if arcade.key.DOWN in self.keys_pressed:
+            self.arrow_pick = "DOWN"
+        
+        if self.arrow_pick == "UP":
+            self.arrow.center_y = self.arrow_y[0]
+        elif self.arrow_pick == "DOWN":
+            self.arrow.center_y = self.arrow_y[1]
+        
+        if arcade.key.ENTER in self.keys_pressed:
+            if self.arrow_pick == "UP":
+                game_view = GameView()
+                self.window.show_view(game_view)
+            elif self.arrow_pick == "DOWN":
+                arcade.exit()
+
+    def on_key_press(self, key, modifiers):
+        self.keys_pressed.append(key)
+    
     def on_key_release(self, key, modifiers):
         self.keys_pressed.remove(key)
 
+
 def main():
-    game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    game.setup()
+    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    start_view = StartView()
+    window.show_view(start_view)
+    arcade.load_font("assets/fonts/PixelFont.ttf")
     arcade.run()
+
 
 
 if __name__ == "__main__":
