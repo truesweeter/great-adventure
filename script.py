@@ -1,6 +1,7 @@
 import arcade
-import math 
+import math
 import random
+from pyglet.graphics import Batch
 
 
 SCREEN_WIDTH = 1000
@@ -9,11 +10,12 @@ SCREEN_TITLE = "Great Adventure"
 SPRITE_SIZE = 32
 FRAMES = 8
 
+
 class Hero(arcade.Sprite):
     def __init__(self):
         super().__init__()
         self.center_x = SCREEN_WIDTH / 2
-        self.center_y = SCREEN_HEIGHT / 2 
+        self.center_y = SCREEN_HEIGHT / 2
 
         self.speed = 200
         self.scale = 1
@@ -54,16 +56,12 @@ class Hero(arcade.Sprite):
         self.shoot_timer = 0
         self.shoot_cooldown = 0.5
 
-        
-
-       
     def update(self, keys_pressed, delta_time, bullets):
         self.keys_pressed = keys_pressed
         moving = False
 
         if self.shoot_timer > 0:
             self.shoot_timer -= delta_time
-
 
         if arcade.key.W in self.keys_pressed:
             self.center_y += self.speed * delta_time
@@ -88,7 +86,7 @@ class Hero(arcade.Sprite):
             bullet.center_x = self.center_x
             bullet.center_y = self.center_y
             bullets.append(bullet)
-            
+
             self.shoot_timer = self.shoot_cooldown
         if arcade.key.DOWN in self.keys_pressed and self.shoot_timer <= 0:
             bullet = Bullet("down")
@@ -109,8 +107,8 @@ class Hero(arcade.Sprite):
             bullet.center_y = self.center_y
             bullets.append(bullet)
             self.shoot_timer = self.shoot_cooldown
-        
-        #не дает пройти персонажу за окно
+
+        # не дает пройти персонажу за окно
         if self.center_x <= 0:
             self.center_x = 0
         if self.center_x >= SCREEN_WIDTH:
@@ -119,9 +117,6 @@ class Hero(arcade.Sprite):
             self.center_y = 0
         if self.center_y >= SCREEN_HEIGHT:
             self.center_y = SCREEN_HEIGHT
-        
-
-
 
         if moving:
             self.animation_timer += 1
@@ -148,7 +143,7 @@ class Hero(arcade.Sprite):
                 self.texture = self.walk_right[0]
             elif self.direction == "left":
                 self.texture = self.walk_left[0]
-        
+
 
 class Bullet(arcade.Sprite):
     def __init__(self, direction):
@@ -169,19 +164,19 @@ class Bullet(arcade.Sprite):
             self.center_y -= self.speed * delta_time
 
         if (
-            self.right < 0 or
-            self.left > SCREEN_WIDTH or
-            self.top < 0 or
-            self.bottom > SCREEN_HEIGHT
+                self.right < 0 or
+                self.left > SCREEN_WIDTH or
+                self.top < 0 or
+                self.bottom > SCREEN_HEIGHT
         ):
             self.remove_from_sprite_lists()
 
-        
+
 class EnemyBeatle(arcade.Sprite):
     def __init__(self, target):
         super().__init__()
         self.target = target
-        
+
         self.is_dead = False
         self.attack = True
 
@@ -206,7 +201,6 @@ class EnemyBeatle(arcade.Sprite):
         ]
         self.texture = self.walk_animation[0]
 
-    
     def update(self, delta_time):
         if self.attack:
             dx = self.target.center_x - self.center_x
@@ -228,13 +222,13 @@ class EnemyBeatle(arcade.Sprite):
                 if self.current_texture >= len(self.walk_animation):
                     self.current_texture = 0
                 self.texture = self.walk_animation[self.current_texture]
-            
+
             if not self.is_dead:
                 if self.target.center_x < self.center_x:
                     self.scale_x = -abs(self.scale_x)
                 else:
                     self.scale_x = abs(self.scale_x)
-        
+
         if self.is_dead:
             self.speed = 0
             self.animation_timer += 1
@@ -251,11 +245,9 @@ class EnemyBeatle(arcade.Sprite):
                 self.remove_from_sprite_lists()
 
 
-
-class MyGame(arcade.Window):
-    def __init__(self, width, height, title):
-        super().__init__(width, height, title)
-        arcade.set_background_color(arcade.color.ASH_GREY)
+class MyGame(arcade.View):
+    def __init__(self):
+        super().__init__()
 
         self.player_list = arcade.SpriteList()
         self.player = Hero()
@@ -263,11 +255,13 @@ class MyGame(arcade.Window):
 
         self.bullets = arcade.SpriteList()
         self.enemies = arcade.SpriteList()
-        
 
-    def setup(self):
         self.keys_pressed = set()
         self.timer = 0
+
+    def on_show_view(self):
+        arcade.set_background_color(arcade.color.ASH_GREY)
+
 
     def on_draw(self):
         self.clear()
@@ -276,15 +270,15 @@ class MyGame(arcade.Window):
         self.enemies.draw()
 
     def on_update(self, delta_time):
+
         self.player.update(self.keys_pressed, delta_time, self.bullets)
         self.bullets.update(delta_time)
         self.enemies.update(delta_time)
 
-
-        #спавн жуков
+        # спавн жуков
         self.timer += delta_time
         if self.timer >= 1:
-            spawn = random.choice([True, False, False, False]) #шанс на спавн 25%
+            spawn = random.choice([True, False, False, False])  # шанс на спавн 25%
             if spawn:
                 self.timer = 0
                 enemy = EnemyBeatle(self.player)
@@ -298,8 +292,8 @@ class MyGame(arcade.Window):
                 self.enemies.append(enemy)
             else:
                 pass
-        
-        #попадение выстрела в жука
+
+        # попадение выстрела в жука
         for bullet in self.bullets:
             hit_list = arcade.check_for_collision_with_list(bullet, self.enemies)
             for enemy in hit_list:
@@ -311,25 +305,69 @@ class MyGame(arcade.Window):
                     enemy.current_texture = 0
                     enemy.texture = enemy.death_animation[0]
 
-        #смерть героя
+        # смерть героя
         hit_list = arcade.check_for_collision_with_list(self.player, self.enemies)
         for enemy in hit_list:
             if not enemy.is_dead:
-                arcade.exit()
-                
+                self.window.show_view(GameOver())
+                return
 
     def on_mouse_press(self, x, y, button, modifiers):
         pass
 
     def on_key_press(self, key, modifiers):
         self.keys_pressed.add(key)
-        
+
     def on_key_release(self, key, modifiers):
         self.keys_pressed.remove(key)
 
+
+class GameOver(arcade.View):
+    def __init__(self):
+        super().__init__()
+
+        self.batch = Batch()
+        self.end_text = None
+        self.restart_text = None
+
+    def on_show_view(self):
+        arcade.set_background_color(arcade.color.BLACK)
+
+        self.batch = Batch()
+        self.end_text = arcade.Text(
+            "GAME OVER",
+            SCREEN_WIDTH // 2,
+            SCREEN_HEIGHT // 2 + 40,
+            arcade.color.RED_DEVIL,
+            font_size=48,
+            anchor_x="center",
+            batch=self.batch
+        )
+
+        self.restart_text = arcade.Text(
+            "Press R to restart",
+            SCREEN_WIDTH // 2,
+            SCREEN_HEIGHT // 2 - 20,
+            arcade.color.WHITE,
+            font_size=20,
+            anchor_x="center",
+            batch=self.batch
+        )
+
+    def on_draw(self):
+        self.clear()
+        self.batch.draw()
+
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.R:
+            game = MyGame()
+            self.window.show_view(game)
+
+
 def main():
-    game = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    game.setup()
+    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    game = MyGame()
+    window.show_view(game)
     arcade.run()
 
 
