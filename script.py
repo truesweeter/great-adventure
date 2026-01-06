@@ -13,9 +13,10 @@ class Hero(arcade.Sprite):
     def __init__(self):
         super().__init__()
         self.center_x = SCREEN_WIDTH / 2
-        self.center_y = SCREEN_HEIGHT / 2 
+        self.center_y = SCREEN_HEIGHT / 2
 
         self.speed = 200
+        self.speed_buff_timer = 0
         self.scale = 1
 
         self.walk_down = [
@@ -54,7 +55,10 @@ class Hero(arcade.Sprite):
         self.shoot_timer = 0
         self.shoot_cooldown = 0.5
 
-        
+
+    def get_buff(self, item):
+        self.speed = 275 # увеличение скорости игрока до 275
+        self.speed_buff_timer = 5
 
        
     def update(self, keys_pressed, delta_time, bullets):
@@ -121,8 +125,6 @@ class Hero(arcade.Sprite):
             self.center_y = SCREEN_HEIGHT
         
 
-
-
         if moving:
             self.animation_timer += 1
 
@@ -148,6 +150,13 @@ class Hero(arcade.Sprite):
                 self.texture = self.walk_right[0]
             elif self.direction == "left":
                 self.texture = self.walk_left[0]
+
+
+        # обновление баффа
+        if self.speed_buff_timer > 0:
+            self.speed_buff_timer -= delta_time
+            if self.speed_buff_timer <= 0:
+                self.speed = 200
         
 
 class Bullet(arcade.Sprite):
@@ -251,6 +260,22 @@ class EnemyBeatle(arcade.Sprite):
                 self.remove_from_sprite_lists()
 
 
+class Item(arcade.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.texture = arcade.load_texture('assets/items/pepper.png')
+        self.scale = 1
+        self.speed = 30
+        self.timer = 0
+        self.direction = 1
+
+    def update(self, delta_time):
+        self.timer += delta_time
+        self.center_y += self.direction * self.speed * delta_time
+        if self.timer % 1 > 0.5:
+            self.direction = 1
+        else:
+            self.direction = -1
 
 class MyGame(arcade.Window):
     def __init__(self, width, height, title):
@@ -263,7 +288,7 @@ class MyGame(arcade.Window):
 
         self.bullets = arcade.SpriteList()
         self.enemies = arcade.SpriteList()
-        
+        self.items = arcade.SpriteList()
 
     def setup(self):
         self.keys_pressed = set()
@@ -271,15 +296,16 @@ class MyGame(arcade.Window):
 
     def on_draw(self):
         self.clear()
+        self.enemies.draw()
         self.player_list.draw()
         self.bullets.draw()
-        self.enemies.draw()
+        self.items.draw()
 
     def on_update(self, delta_time):
         self.player.update(self.keys_pressed, delta_time, self.bullets)
         self.bullets.update(delta_time)
         self.enemies.update(delta_time)
-
+        self.items.update(delta_time)
 
         #спавн жуков
         self.timer += delta_time
@@ -310,6 +336,24 @@ class MyGame(arcade.Window):
                     enemy.animation_timer = 0
                     enemy.current_texture = 0
                     enemy.texture = enemy.death_animation[0]
+                    # выпадение предметов с жуков
+                    drop = random.choice(
+                        [False, False, False, False, False, False, False, False, False, False,
+                         False, False, False, False, False, False, False, False, False, True]
+                    ) # шанс появления предмета 5%
+                    if drop:
+                        item = Item()
+                        item.center_x = enemy.center_x
+                        item.center_y = enemy.center_y
+                        self.items.append(item)
+                        if len(self.items) > 2: # максимум два предмета на карте
+                            self.items[0].remove_from_sprite_lists()
+
+        # подбор предмета
+        picked_items = arcade.check_for_collision_with_list(self.player, self.items)
+        for item in picked_items:
+            item.remove_from_sprite_lists()
+            self.player.get_buff(item)
 
         #смерть героя
         hit_list = arcade.check_for_collision_with_list(self.player, self.enemies)
