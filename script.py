@@ -345,6 +345,13 @@ class Double_pistols(Item):
         self.buff = 'shoot_speed'
         self.scale = 1.7
 
+class Nuke(Item):
+    def __init__(self):
+        super().__init__()
+        self.texture = arcade.load_texture('assets/items/nuke.png')
+        self.buff = 'nuke'
+        self.scale = 1
+
 class GameView(arcade.View):
     def __init__(self):
         super().__init__()
@@ -408,11 +415,20 @@ class GameView(arcade.View):
                     enemy.texture = enemy.death_animation[0]
                     # выпадение предметов с жуков
                     drop = random.choice(
-                        [False, False, False, False, False, False, False, False, False, False,
-                         False, False, False, False, False, False, False, False, False, True]
-                    ) # шанс появления предмета 5%
-                    if True:
-                        items = (Pepper, Double_barreled, Double_pistols,)
+                        [False, False, False, False, False, False, False, True] # шанс появления предмета 12,5%
+                    )
+                    # шансы появления
+                    # перец - 40%
+                    # дробовик - 30%
+                    # двойные пистолеты - 20%
+                    # ядерка - 10%
+                    if drop:
+                        items = (
+                            Pepper, Pepper, Pepper, Pepper,
+                            Double_barreled, Double_barreled, Double_barreled,
+                            Double_pistols, Double_pistols,
+                            Nuke,
+                        )
                         item_name = random.choice(items)
                         item = item_name()
                         item.center_x = enemy.center_x
@@ -421,11 +437,20 @@ class GameView(arcade.View):
                         if len(self.items) > 2: # максимум два предмета на карте
                             self.items[0].remove_from_sprite_lists()
 
+
         # подбор предмета
         picked_items = arcade.check_for_collision_with_list(self.player, self.items)
         for item in picked_items:
             item.remove_from_sprite_lists()
             self.player.get_buff(item)
+
+            if item.buff == 'nuke': # подбор игроком ядерки
+                for enemy in self.enemies:
+                    if enemy.is_dead == False:
+                        enemy.is_dead = True
+                        enemy.animation_timer = 0
+                        enemy.current_texture = 0
+                        enemy.texture = enemy.death_animation[0]
 
         #смерть героя
         hit_list = arcade.check_for_collision_with_list(self.player, self.enemies)
