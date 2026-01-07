@@ -16,13 +16,17 @@ class Hero(arcade.Sprite):
         self.center_y = SCREEN_HEIGHT / 2 
 
         self.speed = 200
-        self.double_barreled = False
         self.scale = 1
 
+        self.double_barreled = False
+        self.auto = False
+        self.auto_timer = 0
+        self.auto_cooldown = 2.5
 
         self.speed_buff_timer = 0
         self.double_buff_timer = 0
-        self.shoot_speed_timer = 0
+        self.shoot_speed_buff_timer = 0
+        self.auto_buff_timer = 0
 
         self.walk_down = [
             arcade.load_texture("assets/hero/down0.png"),
@@ -64,14 +68,16 @@ class Hero(arcade.Sprite):
     def get_buff(self, item):
         if item.buff == 'speed':
             self.speed = 275 # увеличение скорости игрока до 275
-            self.speed_buff_timer = 5
+            self.speed_buff_timer = 8
         if item.buff == 'double':
             self.double_barreled = True
             self.double_buff_timer = 5
         if item.buff == 'shoot_speed':
             self.shoot_cooldown = 0.25
-            self.shoot_speed_timer = 5
-
+            self.shoot_speed_buff_timer = 5
+        if item.buff == 'auto':
+            self.auto = True
+            self.auto_buff_timer = 11
        
     def update(self, keys_pressed, delta_time, bullets):
         self.keys_pressed = keys_pressed
@@ -175,7 +181,54 @@ class Hero(arcade.Sprite):
 
 
             self.shoot_timer = self.shoot_cooldown
-        
+
+        if self.auto:
+            if self.auto_timer == 0: # чтобы при подборе сразу вылетали пули
+                self.auto_timer += delta_time
+                a_bullet1 = Bullet('up')
+                a_bullet1.center_x = self.center_x
+                a_bullet1.center_y = self.center_y
+                bullets.append(a_bullet1)
+
+                a_bullet2 = Bullet('right')
+                a_bullet2.center_x = self.center_x
+                a_bullet2.center_y = self.center_y
+                bullets.append(a_bullet2)
+
+                a_bullet3 = Bullet('down')
+                a_bullet3.center_x = self.center_x
+                a_bullet3.center_y = self.center_y
+                bullets.append(a_bullet3)
+
+                a_bullet4 = Bullet('left')
+                a_bullet4.center_x = self.center_x
+                a_bullet4.center_y = self.center_y
+                bullets.append(a_bullet4)
+
+            elif self.auto_timer < self.auto_cooldown:
+                self.auto_timer += delta_time
+                if self.auto_timer >= self.auto_cooldown:
+                    self.auto_timer = 0.1
+                    a_bullet1 = Bullet('up')
+                    a_bullet1.center_x = self.center_x
+                    a_bullet1.center_y = self.center_y
+                    bullets.append(a_bullet1)
+
+                    a_bullet2 = Bullet('right')
+                    a_bullet2.center_x = self.center_x
+                    a_bullet2.center_y = self.center_y
+                    bullets.append(a_bullet2)
+
+                    a_bullet3 = Bullet('down')
+                    a_bullet3.center_x = self.center_x
+                    a_bullet3.center_y = self.center_y
+                    bullets.append(a_bullet3)
+
+                    a_bullet4 = Bullet('left')
+                    a_bullet4.center_x = self.center_x
+                    a_bullet4.center_y = self.center_y
+                    bullets.append(a_bullet4)
+
         #не дает пройти персонажу за окно
         if self.center_x <= 0:
             self.center_x = 0
@@ -225,12 +278,15 @@ class Hero(arcade.Sprite):
             if self.double_buff_timer <= 0:
                 self.double_barreled = False
 
-        if self.shoot_speed_timer > 0:
-            self.shoot_speed_timer -= delta_time
-            if self.shoot_speed_timer <= 0:
+        if self.shoot_speed_buff_timer > 0:
+            self.shoot_speed_buff_timer -= delta_time
+            if self.shoot_speed_buff_timer <= 0:
                 self.shoot_cooldown = 0.5
 
-
+        if self.auto_buff_timer > 0:
+            self.auto_buff_timer -= delta_time
+            if self.auto_buff_timer <= 0:
+                self.auto = False
 
 class Bullet(arcade.Sprite):
     def __init__(self, direction):
@@ -355,14 +411,14 @@ class Pepper(Item):
         self.texture = arcade.load_texture('assets/items/pepper.png')
         self.buff = 'speed'
 
-class Double_barreled(Item):
+class DoubleBarreled(Item):
     def __init__(self):
         super().__init__()
         self.texture = arcade.load_texture('assets/items/shotgun.png')
         self.scale = 1.3
         self.buff = 'double'
 
-class Double_pistols(Item):
+class DoublePistols(Item):
     def __init__(self):
         super().__init__()
         self.texture = arcade.load_texture('assets/items/revolver.png')
@@ -375,6 +431,12 @@ class Nuke(Item):
         self.texture = arcade.load_texture('assets/items/nuke.png')
         self.buff = 'nuke'
         self.scale = 1
+
+class Autogun(Item):
+    def __init__(self):
+        super().__init__()
+        self.texture = arcade.load_texture('assets/items/auto-shotgun.png')
+        self.buff = 'auto'
 
 class GameView(arcade.View):
     def __init__(self):
@@ -442,15 +504,17 @@ class GameView(arcade.View):
                         [False, False, False, False, False, False, False, True] # шанс появления предмета 12,5%
                     )
                     # шансы появления
-                    # перец - 40%
-                    # дробовик - 30%
-                    # двойные пистолеты - 20%
-                    # ядерка - 10%
+                    # перец - 33%
+                    # дробовик - 25%
+                    # двойные пистолеты - 17%
+                    # автоматическая стрельба - 17%
+                    # ядерка - 8%
                     if drop:
                         items = (
                             Pepper, Pepper, Pepper, Pepper,
-                            Double_barreled, Double_barreled, Double_barreled,
-                            Double_pistols, Double_pistols,
+                            DoubleBarreled, DoubleBarreled, DoubleBarreled,
+                            DoublePistols, DoublePistols,
+                            Autogun, Autogun,
                             Nuke,
                         )
                         item_name = random.choice(items)
