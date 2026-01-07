@@ -16,8 +16,13 @@ class Hero(arcade.Sprite):
         self.center_y = SCREEN_HEIGHT / 2 
 
         self.speed = 200
-        self.speed_buff_timer = 0
+        self.double_barreled = False
         self.scale = 1
+
+
+        self.speed_buff_timer = 0
+        self.double_buff_timer = 0
+
 
         self.walk_down = [
             arcade.load_texture("assets/hero/down0.png"),
@@ -57,8 +62,12 @@ class Hero(arcade.Sprite):
 
 
     def get_buff(self, item):
-        self.speed = 275 # увеличение скорости игрока до 275
-        self.speed_buff_timer = 5
+        if item.buff == 'speed':
+            self.speed = 275 # увеличение скорости игрока до 275
+            self.speed_buff_timer = 5
+        if item.buff == 'double':
+            self.double_barreled = True
+            self.double_buff_timer = 5
 
        
     def update(self, keys_pressed, delta_time, bullets):
@@ -92,7 +101,13 @@ class Hero(arcade.Sprite):
             bullet.center_x = self.center_x
             bullet.center_y = self.center_y
             bullets.append(bullet)
-            
+
+            if self.double_barreled:
+                bullet2 = Bullet('up')
+                bullet2.center_x = self.center_x + 20
+                bullet2.center_y = self.center_y
+                bullets.append(bullet2)
+
             self.shoot_timer = self.shoot_cooldown
         if arcade.key.DOWN in self.keys_pressed and self.shoot_timer <= 0:
             bullet = Bullet("down")
@@ -100,18 +115,38 @@ class Hero(arcade.Sprite):
             bullet.center_y = self.center_y
             bullets.append(bullet)
 
+            if self.double_barreled:
+                bullet2 = Bullet('down')
+                bullet2.center_x = self.center_x - 20
+                bullet2.center_y = self.center_y
+                bullets.append(bullet2)
+
             self.shoot_timer = self.shoot_cooldown
         if arcade.key.RIGHT in self.keys_pressed and self.shoot_timer <= 0:
             bullet = Bullet("right")
             bullet.center_x = self.center_x
             bullet.center_y = self.center_y
             bullets.append(bullet)
+
+            if self.double_barreled:
+                bullet2 = Bullet('right')
+                bullet2.center_x = self.center_x
+                bullet2.center_y = self.center_y + 20
+                bullets.append(bullet2)
+
             self.shoot_timer = self.shoot_cooldown
         if arcade.key.LEFT in self.keys_pressed and self.shoot_timer <= 0:
             bullet = Bullet("left")
             bullet.center_x = self.center_x
             bullet.center_y = self.center_y
             bullets.append(bullet)
+
+            if self.double_barreled:
+                bullet2 = Bullet('left')
+                bullet2.center_x = self.center_x
+                bullet2.center_y = self.center_y - 20
+                bullets.append(bullet2)
+
             self.shoot_timer = self.shoot_cooldown
         
         #не дает пройти персонажу за окно
@@ -124,8 +159,6 @@ class Hero(arcade.Sprite):
         if self.center_y >= SCREEN_HEIGHT:
             self.center_y = SCREEN_HEIGHT
         
-
-
 
         if moving:
             self.animation_timer += 1
@@ -155,10 +188,11 @@ class Hero(arcade.Sprite):
 
 
         # обновление баффа
-        if self.speed_buff_timer > 0:
-            self.speed_buff_timer -= delta_time
-            if self.speed_buff_timer <= 0:
-                self.speed = 200
+        for timer in (self.speed_buff_timer, self.double_buff_timer):
+            if timer > 0:
+                timer -= delta_time
+                if timer <= 0:
+                    self.speed = 200
 
 
 class Bullet(arcade.Sprite):
@@ -265,7 +299,6 @@ class EnemyBeatle(arcade.Sprite):
 class Item(arcade.Sprite):
     def __init__(self):
         super().__init__()
-        self.texture = arcade.load_texture('assets/items/pepper.png')
         self.scale = 1
         self.speed = 30
         self.timer = 0
@@ -278,6 +311,19 @@ class Item(arcade.Sprite):
             self.direction = 1
         else:
             self.direction = -1
+
+class Pepper(Item):
+    def __init__(self):
+        super().__init__()
+        self.texture = arcade.load_texture('assets/items/pepper.png')
+        self.buff = 'speed'
+
+class Double_barreled(Item):
+    def __init__(self):
+        super().__init__()
+        self.texture = arcade.load_texture('assets/items/shotgun.png')
+        self.scale = 1.3
+        self.buff = 'double'
 
 class GameView(arcade.View):
     def __init__(self):
@@ -346,7 +392,9 @@ class GameView(arcade.View):
                          False, False, False, False, False, False, False, False, False, True]
                     ) # шанс появления предмета 5%
                     if drop:
-                        item = Item()
+                        items = (Pepper, Double_barreled,)
+                        item_name = random.choice(items)
+                        item = item_name()
                         item.center_x = enemy.center_x
                         item.center_y = enemy.center_y
                         self.items.append(item)
