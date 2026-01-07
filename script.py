@@ -100,55 +100,79 @@ class Hero(arcade.Sprite):
             self.direction = "left"
 
         if arcade.key.UP in self.keys_pressed and self.shoot_timer <= 0:
-            bullet = Bullet("up")
-            bullet.center_x = self.center_x
-            bullet.center_y = self.center_y
-            bullets.append(bullet)
-
             if self.double_barreled:
+                bullet = Bullet("up")
+                bullet.center_x = self.center_x - 10
+                bullet.center_y = self.center_y
+                bullets.append(bullet)
+
                 bullet2 = Bullet('up')
-                bullet2.center_x = self.center_x + 20
+                bullet2.center_x = self.center_x + 10
                 bullet2.center_y = self.center_y
                 bullets.append(bullet2)
+            else:
+                bullet = Bullet("up")
+                bullet.center_x = self.center_x
+                bullet.center_y = self.center_y
+                bullets.append(bullet)
+
 
             self.shoot_timer = self.shoot_cooldown
         if arcade.key.DOWN in self.keys_pressed and self.shoot_timer <= 0:
-            bullet = Bullet("down")
-            bullet.center_x = self.center_x
-            bullet.center_y = self.center_y
-            bullets.append(bullet)
-
             if self.double_barreled:
                 bullet2 = Bullet('down')
-                bullet2.center_x = self.center_x - 20
+                bullet2.center_x = self.center_x - 10
                 bullet2.center_y = self.center_y
                 bullets.append(bullet2)
 
+                bullet = Bullet("down")
+                bullet.center_x = self.center_x + 10
+                bullet.center_y = self.center_y
+                bullets.append(bullet)
+            else:
+                bullet = Bullet("down")
+                bullet.center_x = self.center_x
+                bullet.center_y = self.center_y
+                bullets.append(bullet)
+
+
             self.shoot_timer = self.shoot_cooldown
         if arcade.key.RIGHT in self.keys_pressed and self.shoot_timer <= 0:
-            bullet = Bullet("right")
-            bullet.center_x = self.center_x
-            bullet.center_y = self.center_y
-            bullets.append(bullet)
-
             if self.double_barreled:
                 bullet2 = Bullet('right')
                 bullet2.center_x = self.center_x
-                bullet2.center_y = self.center_y + 20
+                bullet2.center_y = self.center_y + 10
                 bullets.append(bullet2)
+
+                bullet = Bullet("right")
+                bullet.center_x = self.center_x
+                bullet.center_y = self.center_y - 10
+                bullets.append(bullet)
+            else:
+                bullet = Bullet("right")
+                bullet.center_x = self.center_x
+                bullet.center_y = self.center_y
+                bullets.append(bullet)
+
 
             self.shoot_timer = self.shoot_cooldown
         if arcade.key.LEFT in self.keys_pressed and self.shoot_timer <= 0:
-            bullet = Bullet("left")
-            bullet.center_x = self.center_x
-            bullet.center_y = self.center_y
-            bullets.append(bullet)
-
             if self.double_barreled:
                 bullet2 = Bullet('left')
                 bullet2.center_x = self.center_x
-                bullet2.center_y = self.center_y - 20
+                bullet2.center_y = self.center_y - 10
                 bullets.append(bullet2)
+
+                bullet = Bullet("left")
+                bullet.center_x = self.center_x
+                bullet.center_y = self.center_y + 10
+                bullets.append(bullet)
+            else:
+                bullet = Bullet("left")
+                bullet.center_x = self.center_x
+                bullet.center_y = self.center_y
+                bullets.append(bullet)
+
 
             self.shoot_timer = self.shoot_cooldown
         
