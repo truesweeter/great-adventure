@@ -22,7 +22,7 @@ class Hero(arcade.Sprite):
 
         self.speed_buff_timer = 0
         self.double_buff_timer = 0
-
+        self.shoot_speed_timer = 0
 
         self.walk_down = [
             arcade.load_texture("assets/hero/down0.png"),
@@ -68,6 +68,9 @@ class Hero(arcade.Sprite):
         if item.buff == 'double':
             self.double_barreled = True
             self.double_buff_timer = 5
+        if item.buff == 'shoot_speed':
+            self.shoot_cooldown = 0.25
+            self.shoot_speed_timer = 5
 
        
     def update(self, keys_pressed, delta_time, bullets):
@@ -187,12 +190,22 @@ class Hero(arcade.Sprite):
                 self.texture = self.walk_left[0]
 
 
-        # обновление баффа
-        for timer in (self.speed_buff_timer, self.double_buff_timer):
-            if timer > 0:
-                timer -= delta_time
-                if timer <= 0:
-                    self.speed = 200
+        # обновление баффов
+        if self.speed_buff_timer > 0:
+            self.speed_buff_timer -= delta_time
+            if self.speed_buff_timer <= 0:
+                self.speed = 200
+
+        if self.double_buff_timer > 0:
+            self.double_buff_timer -= delta_time
+            if self.double_buff_timer <= 0:
+                self.double_barreled = False
+
+        if self.shoot_speed_timer > 0:
+            self.shoot_speed_timer -= delta_time
+            if self.shoot_speed_timer <= 0:
+                self.shoot_cooldown = 0.5
+
 
 
 class Bullet(arcade.Sprite):
@@ -325,6 +338,13 @@ class Double_barreled(Item):
         self.scale = 1.3
         self.buff = 'double'
 
+class Double_pistols(Item):
+    def __init__(self):
+        super().__init__()
+        self.texture = arcade.load_texture('assets/items/revolver.png')
+        self.buff = 'shoot_speed'
+        self.scale = 1.7
+
 class GameView(arcade.View):
     def __init__(self):
         super().__init__()
@@ -391,8 +411,8 @@ class GameView(arcade.View):
                         [False, False, False, False, False, False, False, False, False, False,
                          False, False, False, False, False, False, False, False, False, True]
                     ) # шанс появления предмета 5%
-                    if drop:
-                        items = (Pepper, Double_barreled,)
+                    if True:
+                        items = (Pepper, Double_barreled, Double_pistols,)
                         item_name = random.choice(items)
                         item = item_name()
                         item.center_x = enemy.center_x
