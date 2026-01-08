@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="70" tileheight="70" infinite="0" nextlayerid="5" nextobjectid="1">
- <tileset firstgid="1" source="../../stone.tsx"/>
- <tileset firstgid="2" source="../../box.tsx"/>
- <tileset firstgid="3" source="../../col.tsx"/>
+ <tileset firstgid="1" source="stone.tsx"/>
+ <tileset firstgid="2" source="box.tsx"/>
+ <tileset firstgid="3" source="col.tsx"/>
  <layer id="2" name="stone" width="20" height="20">
   <data encoding="base64" compression="zlib">
    eJxjZGBgYBzFo3gUj+JRPIpJxADrnAGR
