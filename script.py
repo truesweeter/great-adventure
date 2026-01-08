@@ -677,11 +677,13 @@ class PauseView(arcade.View):
     def __init__(self, game_view):
         super().__init__()
         self.game_view = game_view
+        self.ui_camera = arcade.camera.Camera2D()
 
     def on_draw(self):
         self.clear()
-        self.keys_pressed = set()
         self.game_view.on_draw()
+        self.ui_camera.use()
+        self.keys_pressed = set()
 
         arcade.draw_rect_filled(
             arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT),
