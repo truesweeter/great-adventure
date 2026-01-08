@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="70" tileheight="70" infinite="0" nextlayerid="5" nextobjectid="1">
+ <tileset firstgid="1" source="../../stone.tsx"/>
+ <tileset firstgid="2" source="../../box.tsx"/>
+ <tileset firstgid="3" source="../../col.tsx"/>
+ <layer id="2" name="stone" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjZGBgYBzFo3gUj+JRPIpJxADrnAGR
+  </data>
+ </layer>
+ <layer id="3" name="box" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgagIlMPTBMDfMI2TUKRsFIB4M9X9Ern+Ire4YTAABVSAAZ
+  </data>
+ </layer>
+ <layer id="4" name="collision" width="20" height="20" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgagJlMPTBMDfMI2TUKRsFIB4M9X9Ern+Ire4YTAAB8zAAl
+  </data>
+ </layer>
+</map>

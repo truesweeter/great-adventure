@@ -1,7 +1,6 @@
 import arcade
-import math 
+import math
 import random
-
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 720
@@ -9,11 +8,12 @@ SCREEN_TITLE = "Great Adventure"
 SPRITE_SIZE = 32
 FRAMES = 8
 
+
 class Hero(arcade.Sprite):
     def __init__(self):
         super().__init__()
         self.center_x = SCREEN_WIDTH / 2
-        self.center_y = SCREEN_HEIGHT / 2 
+        self.center_y = SCREEN_HEIGHT / 2
 
         self.speed = 200
         self.scale = 1
@@ -64,10 +64,9 @@ class Hero(arcade.Sprite):
         self.shoot_timer = 0
         self.shoot_cooldown = 0.5
 
-
     def get_buff(self, item):
         if item.buff == 'speed':
-            self.speed = 275 # увеличение скорости игрока до 275
+            self.speed = 275  # увеличение скорости игрока до 275
             self.speed_buff_timer = 8
         if item.buff == 'double':
             self.double_barreled = True
@@ -78,14 +77,13 @@ class Hero(arcade.Sprite):
         if item.buff == 'auto':
             self.auto = True
             self.auto_buff_timer = 11
-       
+
     def update(self, keys_pressed, delta_time, bullets):
         self.keys_pressed = keys_pressed
         moving = False
 
         if self.shoot_timer > 0:
             self.shoot_timer -= delta_time
-
 
         if arcade.key.W in self.keys_pressed:
             self.center_y += self.speed * delta_time
@@ -122,7 +120,6 @@ class Hero(arcade.Sprite):
                 bullet.center_y = self.center_y
                 bullets.append(bullet)
 
-
             self.shoot_timer = self.shoot_cooldown
         if arcade.key.DOWN in self.keys_pressed and self.shoot_timer <= 0:
             if self.double_barreled:
@@ -140,7 +137,6 @@ class Hero(arcade.Sprite):
                 bullet.center_x = self.center_x
                 bullet.center_y = self.center_y
                 bullets.append(bullet)
-
 
             self.shoot_timer = self.shoot_cooldown
         if arcade.key.RIGHT in self.keys_pressed and self.shoot_timer <= 0:
@@ -160,7 +156,6 @@ class Hero(arcade.Sprite):
                 bullet.center_y = self.center_y
                 bullets.append(bullet)
 
-
             self.shoot_timer = self.shoot_cooldown
         if arcade.key.LEFT in self.keys_pressed and self.shoot_timer <= 0:
             if self.double_barreled:
@@ -179,11 +174,10 @@ class Hero(arcade.Sprite):
                 bullet.center_y = self.center_y
                 bullets.append(bullet)
 
-
             self.shoot_timer = self.shoot_cooldown
 
         if self.auto:
-            if self.auto_timer == 0: # чтобы при подборе сразу вылетали пули
+            if self.auto_timer == 0:  # чтобы при подборе сразу вылетали пули
                 self.auto_timer += delta_time
                 a_bullet1 = Bullet('up')
                 a_bullet1.center_x = self.center_x
@@ -229,7 +223,7 @@ class Hero(arcade.Sprite):
                     a_bullet4.center_y = self.center_y
                     bullets.append(a_bullet4)
 
-        #не дает пройти персонажу за окно
+        # не дает пройти персонажу за окно
         if self.center_x <= 0:
             self.center_x = 0
         if self.center_x >= SCREEN_WIDTH:
@@ -238,7 +232,6 @@ class Hero(arcade.Sprite):
             self.center_y = 0
         if self.center_y >= SCREEN_HEIGHT:
             self.center_y = SCREEN_HEIGHT
-        
 
         if moving:
             self.animation_timer += 1
@@ -266,7 +259,6 @@ class Hero(arcade.Sprite):
             elif self.direction == "left":
                 self.texture = self.walk_left[0]
 
-
         # обновление баффов
         if self.speed_buff_timer > 0:
             self.speed_buff_timer -= delta_time
@@ -288,6 +280,7 @@ class Hero(arcade.Sprite):
             if self.auto_buff_timer <= 0:
                 self.auto = False
 
+
 class Bullet(arcade.Sprite):
     def __init__(self, direction):
         super().__init__()
@@ -307,19 +300,19 @@ class Bullet(arcade.Sprite):
             self.center_y -= self.speed * delta_time
 
         if (
-            self.right < 0 or
-            self.left > SCREEN_WIDTH or
-            self.top < 0 or
-            self.bottom > SCREEN_HEIGHT
+                self.right < 0 or
+                self.left > SCREEN_WIDTH or
+                self.top < 0 or
+                self.bottom > SCREEN_HEIGHT
         ):
             self.remove_from_sprite_lists()
 
-        
+
 class EnemyBeatle(arcade.Sprite):
     def __init__(self, target):
         super().__init__()
         self.target = target
-        
+
         self.is_dead = False
         self.attack = True
 
@@ -344,7 +337,6 @@ class EnemyBeatle(arcade.Sprite):
         ]
         self.texture = self.walk_animation[0]
 
-    
     def update(self, delta_time):
         if self.attack:
             dx = self.target.center_x - self.center_x
@@ -366,13 +358,13 @@ class EnemyBeatle(arcade.Sprite):
                 if self.current_texture >= len(self.walk_animation):
                     self.current_texture = 0
                 self.texture = self.walk_animation[self.current_texture]
-            
+
             if not self.is_dead:
                 if self.target.center_x < self.center_x:
                     self.scale_x = -abs(self.scale_x)
                 else:
                     self.scale_x = abs(self.scale_x)
-        
+
         if self.is_dead:
             self.speed = 0
             self.animation_timer += 1
@@ -405,11 +397,13 @@ class Item(arcade.Sprite):
         else:
             self.direction = -1
 
+
 class Pepper(Item):
     def __init__(self):
         super().__init__()
         self.texture = arcade.load_texture('assets/items/pepper.png')
         self.buff = 'speed'
+
 
 class DoubleBarreled(Item):
     def __init__(self):
@@ -418,12 +412,14 @@ class DoubleBarreled(Item):
         self.scale = 1.3
         self.buff = 'double'
 
+
 class DoublePistols(Item):
     def __init__(self):
         super().__init__()
         self.texture = arcade.load_texture('assets/items/revolver.png')
         self.buff = 'shoot_speed'
         self.scale = 1.7
+
 
 class Nuke(Item):
     def __init__(self):
@@ -432,11 +428,13 @@ class Nuke(Item):
         self.buff = 'nuke'
         self.scale = 1
 
+
 class Autogun(Item):
     def __init__(self):
         super().__init__()
         self.texture = arcade.load_texture('assets/items/auto-shotgun.png')
         self.buff = 'auto'
+
 
 class GameView(arcade.View):
     def __init__(self):
@@ -453,12 +451,23 @@ class GameView(arcade.View):
         self.enemies = arcade.SpriteList()
         self.items = arcade.SpriteList()
 
+        tile_map = arcade.load_tilemap('map.tmx', scaling=0.6)
+        self.wall_list = tile_map.sprite_lists['box']
+        self.ground_list = tile_map.sprite_lists['stone']
+        self.collision_list = tile_map.sprite_lists['collision']
+        self.player_physics = arcade.PhysicsEngineSimple(self.player, self.collision_list)
+
+        self.camera = arcade.camera.Camera2D()
+
     def setup(self):
         self.keys_pressed = set()
         self.timer = 0
 
     def on_draw(self):
         self.clear()
+        self.camera.use()
+        self.ground_list.draw()
+        self.wall_list.draw()
         self.enemies.draw()
         self.player_list.draw()
         self.bullets.draw()
@@ -466,17 +475,21 @@ class GameView(arcade.View):
 
     def on_update(self, delta_time):
         self.player.update(self.keys_pressed, delta_time, self.bullets)
+        self.player_physics.update()
+        for enemy in self.enemies:
+            enemy.physics.update()
         self.bullets.update(delta_time)
         self.enemies.update(delta_time)
         self.items.update(delta_time)
 
-        #спавн жуков
+        # спавн жуков
         self.timer += delta_time
         if self.timer >= 1:
-            spawn = random.choice([True, False, False, False]) #шанс на спавн 25%
+            spawn = random.choice([True, False, False, False])  # шанс на спавн 25%
             if spawn:
                 self.timer = 0
                 enemy = EnemyBeatle(self.player)
+                enemy.physics = arcade.PhysicsEngineSimple(enemy, self.collision_list)
                 position = random.randint(0, 1)
                 if position == 0:
                     enemy.center_y = random.randint(0, SCREEN_HEIGHT)
@@ -487,8 +500,8 @@ class GameView(arcade.View):
                 self.enemies.append(enemy)
             else:
                 pass
-        
-        #попадение выстрела в жука
+
+        # попадение выстрела в жука
         for bullet in self.bullets:
             hit_list = arcade.check_for_collision_with_list(bullet, self.enemies)
             for enemy in hit_list:
@@ -501,7 +514,7 @@ class GameView(arcade.View):
                     enemy.texture = enemy.death_animation[0]
                     # выпадение предметов с жуков
                     drop = random.choice(
-                        [False, False, False, False, False, False, False, True] # шанс появления предмета 12,5%
+                        [False, False, False, False, False, False, False, True]  # шанс появления предмета 12,5%
                     )
                     # шансы появления
                     # перец - 33%
@@ -522,9 +535,8 @@ class GameView(arcade.View):
                         item.center_x = enemy.center_x
                         item.center_y = enemy.center_y
                         self.items.append(item)
-                        if len(self.items) > 2: # максимум два предмета на карте
+                        if len(self.items) > 2:  # максимум два предмета на карте
                             self.items[0].remove_from_sprite_lists()
-
 
         # подбор предмета
         picked_items = arcade.check_for_collision_with_list(self.player, self.items)
@@ -532,7 +544,7 @@ class GameView(arcade.View):
             item.remove_from_sprite_lists()
             self.player.get_buff(item)
 
-            if item.buff == 'nuke': # подбор игроком ядерки
+            if item.buff == 'nuke':  # подбор игроком ядерки
                 for enemy in self.enemies:
                     if enemy.is_dead == False:
                         enemy.is_dead = True
@@ -540,20 +552,33 @@ class GameView(arcade.View):
                         enemy.current_texture = 0
                         enemy.texture = enemy.death_animation[0]
 
-        #смерть героя
+        # попадание пули в стену
+        for bullet in self.bullets:
+            if arcade.check_for_collision_with_list(bullet, self.collision_list):
+                bullet.remove_from_sprite_lists()
+
+        # смерть героя
         hit_list = arcade.check_for_collision_with_list(self.player, self.enemies)
         for enemy in hit_list:
             if not enemy.is_dead:
                 death_view = DeathView()
                 self.window.show_view(death_view)
-                
+
+        self.center_camera()
+
+    def center_camera(self):
+        screen_center_x = self.player.center_x
+        screen_center_y = self.player.center_y
+        screen_center_x = max(0, screen_center_x)
+        screen_center_y = max(0, screen_center_y)
+        self.camera.position = (screen_center_x, screen_center_y)
 
     def on_mouse_press(self, x, y, button, modifiers):
         pass
 
     def on_key_press(self, key, modifiers):
         self.keys_pressed.append(key)
-        
+
     def on_key_release(self, key, modifiers):
         if key in self.keys_pressed:
             self.keys_pressed.remove(key)
@@ -571,11 +596,11 @@ class StartView(arcade.View):
         logo.center_y = SCREEN_HEIGHT / 2 + 100
         arcade.set_background_color(arcade.color.BLACK)
 
-
     def on_draw(self):
         self.clear()
         self.logo_list.draw()
-        arcade.draw_text("Для начала игры нажмите любую клавишу", SCREEN_WIDTH / 2 - 275, SCREEN_HEIGHT / 2 - 200, font_size=17, font_name="Minecraft Rus")
+        arcade.draw_text("Для начала игры нажмите любую клавишу", SCREEN_WIDTH / 2 - 275, SCREEN_HEIGHT / 2 - 200,
+                         font_size=17, font_name="Minecraft Rus")
 
     def on_key_press(self, key, modifiers):
         self.keys_pressed.append(key)
@@ -597,7 +622,7 @@ class DeathView(arcade.View):
         arcade.set_background_color(arcade.color.GRAY_BLUE)
         self.keys_pressed = []
 
-        #cтрелка выбора
+        # cтрелка выбора
         self.arrow_y = [SCREEN_HEIGHT / 2 - 170, SCREEN_HEIGHT / 2 - 220]
         self.arrow_pick = "UP"
         self.arrow = arcade.Sprite("assets/arrow.png")
@@ -606,14 +631,19 @@ class DeathView(arcade.View):
         self.arrow.center_y = SCREEN_HEIGHT / 2 - 175
         self.all_sprites.append(self.arrow)
 
+        self.ui_camera = arcade.camera.Camera2D()
 
     def on_draw(self):
         self.clear()
+        self.ui_camera.use()
         self.all_sprites.draw()
-        arcade.draw_text("Вы умерли! Желаете начать заново?", SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 - 100, font_name="Minecraft Rus", font_size=17)
+        arcade.draw_text("Вы умерли! Желаете начать заново?", SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 - 100,
+                         font_name="Minecraft Rus", font_size=17)
 
-        arcade.draw_text("Да, начать новую игру", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 - 175, font_name="Minecraft Rus", font_size=15)
-        arcade.draw_text("Нет, выйти из игры", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 - 225, font_name="Minecraft Rus", font_size=15)
+        arcade.draw_text("Да, начать новую игру", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 - 175,
+                         font_name="Minecraft Rus", font_size=15)
+        arcade.draw_text("Нет, выйти из игры", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 - 225,
+                         font_name="Minecraft Rus", font_size=15)
 
     def on_update(self, delta_time):
         if arcade.key.UP in self.keys_pressed:
@@ -646,7 +676,6 @@ def main():
     window.show_view(start_view)
     arcade.load_font("assets/fonts/PixelFont.ttf")
     arcade.run()
-
 
 
 if __name__ == "__main__":
