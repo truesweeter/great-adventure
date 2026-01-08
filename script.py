@@ -585,6 +585,9 @@ class GameView(arcade.View):
         #переход в паузу
         if key == arcade.key.ESCAPE:
             self.window.show_view(PauseView(self))
+    def on_hide_view(self):
+        self.keys_pressed.clear()
+
 
 
 class StartView(arcade.View):
