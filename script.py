@@ -330,6 +330,10 @@ class GameView(arcade.View):
     def on_key_release(self, key, modifiers):
         if key in self.keys_pressed:
             self.keys_pressed.remove(key)
+        
+        #переход в паузу
+        if key == arcade.key.ESCAPE:
+            self.window.show_view(PauseView(self))
 
 
 class StartView(arcade.View):
@@ -411,6 +415,37 @@ class DeathView(arcade.View):
     
     def on_key_release(self, key, modifiers):
         self.keys_pressed.remove(key)
+
+
+class PauseView(arcade.View):
+    def __init__(self, game_view):
+        super().__init__()
+        self.game_view = game_view
+
+    def on_draw(self):
+        self.clear()
+        self.keys_pressed = set()
+        self.game_view.on_draw()
+
+        arcade.draw_rect_filled(
+            arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT),
+            (0, 0, 0, 160)
+        )
+        
+        arcade.draw_text(
+            "ПАУЗА",
+            SCREEN_WIDTH / 2,
+            SCREEN_HEIGHT / 2 + 30,
+            arcade.color.WHITE,
+            40,
+            anchor_x="center",
+            font_name="Minecraft Rus"
+        )
+    
+    def on_key_release(self, key, modifiers):
+        if key == arcade.key.ESCAPE:
+            self.window.show_view(self.game_view)
+
 
 
 def main():
