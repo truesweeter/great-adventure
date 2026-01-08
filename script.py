@@ -415,7 +415,7 @@ class DoubleBarreled(Item):
     def __init__(self):
         super().__init__()
         self.texture = arcade.load_texture('assets/items/shotgun.png')
-        self.scale = 1.3
+        self.scale = 1.4
         self.buff = 'double'
 
 class DoublePistols(Item):
@@ -423,7 +423,6 @@ class DoublePistols(Item):
         super().__init__()
         self.texture = arcade.load_texture('assets/items/revolver.png')
         self.buff = 'shoot_speed'
-        self.scale = 1.7
 
 class Nuke(Item):
     def __init__(self):
@@ -658,7 +657,7 @@ class PauseView(arcade.View):
             arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT),
             (0, 0, 0, 160)
         )
-        
+
         arcade.draw_text(
             "ПАУЗА",
             SCREEN_WIDTH / 2,
