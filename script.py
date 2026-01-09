@@ -64,6 +64,9 @@ class Hero(arcade.Sprite):
         self.shoot_timer = 0
         self.shoot_cooldown = 0.5
 
+        self.shot_sound = arcade.load_sound("assets/sounds/shot.wav")
+        self.shot2_sound = arcade.load_sound("assets/sounds/shot2.wav")
+
     def get_buff(self, item):
         if item.buff == 'speed':
             self.speed = 275  # увеличение скорости игрока до 275
@@ -104,6 +107,7 @@ class Hero(arcade.Sprite):
             self.direction = "left"
 
         if arcade.key.UP in self.keys_pressed and self.shoot_timer <= 0:
+            arcade.play_sound(self.shot_sound)
             if self.double_barreled:
                 bullet = Bullet("up")
                 bullet.center_x = self.center_x - 10
@@ -122,6 +126,7 @@ class Hero(arcade.Sprite):
 
             self.shoot_timer = self.shoot_cooldown
         if arcade.key.DOWN in self.keys_pressed and self.shoot_timer <= 0:
+            arcade.play_sound(self.shot_sound)
             if self.double_barreled:
                 bullet2 = Bullet('down')
                 bullet2.center_x = self.center_x - 10
@@ -140,6 +145,7 @@ class Hero(arcade.Sprite):
 
             self.shoot_timer = self.shoot_cooldown
         if arcade.key.RIGHT in self.keys_pressed and self.shoot_timer <= 0:
+            arcade.play_sound(self.shot_sound)
             if self.double_barreled:
                 bullet2 = Bullet('right')
                 bullet2.center_x = self.center_x
@@ -158,6 +164,7 @@ class Hero(arcade.Sprite):
 
             self.shoot_timer = self.shoot_cooldown
         if arcade.key.LEFT in self.keys_pressed and self.shoot_timer <= 0:
+            arcade.play_sound(self.shot_sound)
             if self.double_barreled:
                 bullet2 = Bullet('left')
                 bullet2.center_x = self.center_x
@@ -178,6 +185,7 @@ class Hero(arcade.Sprite):
 
         if self.auto:
             if self.auto_timer == 0:  # чтобы при подборе сразу вылетали пули
+                arcade.play_sound(self.shot2_sound)
                 self.auto_timer += delta_time
                 a_bullet1 = Bullet('up')
                 a_bullet1.center_x = self.center_x
@@ -203,6 +211,7 @@ class Hero(arcade.Sprite):
                 self.auto_timer += delta_time
                 if self.auto_timer >= self.auto_cooldown:
                     self.auto_timer = 0.1
+                    arcade.play_sound(self.shot2_sound)
                     a_bullet1 = Bullet('up')
                     a_bullet1.center_x = self.center_x
                     a_bullet1.center_y = self.center_y
@@ -458,6 +467,10 @@ class GameView(arcade.View):
 
         self.camera = arcade.camera.Camera2D()
 
+        self.pick_up_sound = arcade.load_sound("assets/sounds/pick_up.mp3")
+        self.nuke_sound = arcade.load_sound("assets/sounds/nuke.mp3")
+
+
     def setup(self):
         self.keys_pressed = set()
         self.timer = 0
@@ -541,8 +554,8 @@ class GameView(arcade.View):
         picked_items = arcade.check_for_collision_with_list(self.player, self.items)
         for item in picked_items:
             item.remove_from_sprite_lists()
+            self.play_pick_up_sound(item)
             self.player.get_buff(item)
-
             if item.buff == 'nuke':  # подбор игроком ядерки
                 for enemy in self.enemies:
                     if enemy.is_dead == False:
@@ -585,9 +598,15 @@ class GameView(arcade.View):
         #переход в паузу
         if key == arcade.key.ESCAPE:
             self.window.show_view(PauseView(self))
+
     def on_hide_view(self):
         self.keys_pressed.clear()
 
+    def play_pick_up_sound(self, item):
+        if item.buff == "nuke":
+            arcade.play_sound(self.nuke_sound)
+        else:
+            arcade.play_sound(self.pick_up_sound)
 
 
 class StartView(arcade.View):
@@ -602,6 +621,8 @@ class StartView(arcade.View):
         logo.center_y = SCREEN_HEIGHT / 2 + 100
         arcade.set_background_color(arcade.color.BLACK)
 
+        self.start_sound = arcade.load_sound("assets/sounds/start.wav")
+
     def on_draw(self):
         self.clear()
         self.logo_list.draw()
@@ -614,6 +635,7 @@ class StartView(arcade.View):
     def on_update(self, delta_time):
         if self.keys_pressed:
             game_view = GameView()
+            arcade.play_sound(self.start_sound)
             self.window.show_view(game_view)
 
 
@@ -638,6 +660,12 @@ class DeathView(arcade.View):
         self.all_sprites.append(self.arrow)
 
         self.ui_camera = arcade.camera.Camera2D()
+        self.death_sound = arcade.load_sound("assets/sounds/lose.wav")
+        self.select_sound = arcade.load_sound("assets/sounds/select.wav")
+        self.start_sound = arcade.load_sound("assets/sounds/start.wav")
+        arcade.play_sound(self.death_sound)
+
+
 
     def on_draw(self):
         self.clear()
@@ -653,9 +681,15 @@ class DeathView(arcade.View):
 
     def on_update(self, delta_time):
         if arcade.key.UP in self.keys_pressed:
+            if self.arrow_pick == "DOWN":
+                arcade.play_sound(self.select_sound)
             self.arrow_pick = "UP"
+            
         if arcade.key.DOWN in self.keys_pressed:
+            if self.arrow_pick == "UP":
+                arcade.play_sound(self.select_sound)
             self.arrow_pick = "DOWN"
+            
 
         if self.arrow_pick == "UP":
             self.arrow.center_y = self.arrow_y[0]
@@ -664,6 +698,7 @@ class DeathView(arcade.View):
 
         if arcade.key.ENTER in self.keys_pressed:
             if self.arrow_pick == "UP":
+                arcade.play_sound(self.start_sound)
                 game_view = GameView()
                 self.window.show_view(game_view)
             elif self.arrow_pick == "DOWN":
