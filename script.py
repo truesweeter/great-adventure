@@ -503,12 +503,24 @@ class GameView(arcade.View):
                 enemy = EnemyBeatle(self.player)
                 enemy.physics = arcade.PhysicsEngineSimple(enemy, self.collision_list)
                 position = random.randint(0, 1)
+                
+                cam_x = self.camera.position.x
+                cam_y = self.camera.position.y
+                offset = 50
+
                 if position == 0:
-                    enemy.center_y = random.randint(0, SCREEN_HEIGHT)
-                    enemy.center_x = random.choice([0, SCREEN_WIDTH])
+                    enemy.center_y = random.randint(int(cam_y - SCREEN_HEIGHT / 2), int(cam_y + SCREEN_HEIGHT / 2))
+                    enemy.center_x = random.choice([
+                        int(cam_x - SCREEN_WIDTH / 2 - offset), 
+                        int(cam_x + SCREEN_WIDTH / 2 + offset)
+                    ])
                 else:
-                    enemy.center_x = random.randint(0, SCREEN_WIDTH)
-                    enemy.center_y = random.choice([0, SCREEN_HEIGHT])
+                    enemy.center_x = random.randint(int(cam_x - SCREEN_WIDTH / 2), int(cam_x + SCREEN_WIDTH / 2))
+                    enemy.center_y = random.choice([
+                        int(cam_y - SCREEN_HEIGHT / 2 - offset), 
+                        int(cam_y + SCREEN_HEIGHT / 2 + offset)
+                    ])
+                
                 self.enemies.append(enemy)
             else:
                 pass
