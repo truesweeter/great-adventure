@@ -471,7 +471,7 @@ class EnemyZombie(arcade.Sprite):
             if self.timer >= 8:
                 self.timer = 0
                 self.remove_from_sprite_lists()
-        
+
 
 
 class Item(arcade.Sprite):
@@ -534,7 +534,8 @@ class GameView(arcade.View):
         arcade.set_background_color(arcade.color.ASH_GREY)
         self.keys_pressed = []
         self.timer = 0
-
+        self.kill_count = 0
+        self.time_survived = 0.0
         self.player_list = arcade.SpriteList()
         self.player = Hero()
         self.player_list.append(self.player)
@@ -568,8 +569,27 @@ class GameView(arcade.View):
         self.player_list.draw()
         self.bullets.draw()
         self.items.draw()
+        arcade.draw_text(
+            f"Убийства: {self.kill_count}",
+            self.camera.position.x - SCREEN_WIDTH // 2 + 20,
+            self.camera.position.y - SCREEN_HEIGHT // 2 + 40,
+            arcade.color.WHITE,
+            16,
+            font_name="Minecraft Rus"
+        )
+
+        arcade.draw_text(
+            f"Время: {int(self.time_survived)} c",
+            self.camera.position.x - SCREEN_WIDTH // 2 + 20,
+            self.camera.position.y - SCREEN_HEIGHT // 2 + 20,
+            arcade.color.WHITE,
+            16,
+            font_name="Minecraft Rus"
+        )
 
     def on_update(self, delta_time):
+        self.time_survived += delta_time
+
         self.player.update(self.keys_pressed, delta_time, self.bullets)
         self.player_physics.update()
         for enemy in self.enemies:
@@ -592,7 +612,7 @@ class GameView(arcade.View):
                 self.timer = 0
                 enemy.physics = arcade.PhysicsEngineSimple(enemy, self.collision_list)
                 position = random.randint(0, 1)
-                
+
                 cam_x = self.camera.position.x
                 cam_y = self.camera.position.y
                 offset = 50
@@ -600,16 +620,16 @@ class GameView(arcade.View):
                 if position == 0:
                     enemy.center_y = random.randint(int(cam_y - SCREEN_HEIGHT / 2), int(cam_y + SCREEN_HEIGHT / 2))
                     enemy.center_x = random.choice([
-                        int(cam_x - SCREEN_WIDTH / 2 - offset), 
+                        int(cam_x - SCREEN_WIDTH / 2 - offset),
                         int(cam_x + SCREEN_WIDTH / 2 + offset)
                     ])
                 else:
                     enemy.center_x = random.randint(int(cam_x - SCREEN_WIDTH / 2), int(cam_x + SCREEN_WIDTH / 2))
                     enemy.center_y = random.choice([
-                        int(cam_y - SCREEN_HEIGHT / 2 - offset), 
+                        int(cam_y - SCREEN_HEIGHT / 2 - offset),
                         int(cam_y + SCREEN_HEIGHT / 2 + offset)
                     ])
-                
+
                 self.enemies.append(enemy)
             else:
                 pass
@@ -623,6 +643,7 @@ class GameView(arcade.View):
                 if not enemy.is_dead:
                     if isinstance(enemy, EnemyBeatle):
                         enemy.is_dead = True
+                        self.kill_count += 1
                         enemy.animation_timer = 0
                         enemy.current_texture = 0
                         enemy.texture = enemy.death_animation[0]
@@ -631,10 +652,11 @@ class GameView(arcade.View):
                             enemy.hp -= 1
                         else:
                             enemy.is_dead = True
+                            self.kill_count += 1
                             enemy.animation_timer = 0
                             enemy.current_texture = 0
                             enemy.texture = enemy.death_animation[0]
-                      
+
                     # выпадение предметов с врагов
                     if enemy.is_dead:
                         drop = random.choice(
@@ -706,7 +728,7 @@ class GameView(arcade.View):
     def on_key_release(self, key, modifiers):
         if key in self.keys_pressed:
             self.keys_pressed.remove(key)
-        
+
         #переход в паузу
         if key == arcade.key.ESCAPE:
             self.window.show_view(PauseView(self))
@@ -796,12 +818,12 @@ class DeathView(arcade.View):
             if self.arrow_pick == "DOWN":
                 arcade.play_sound(self.select_sound)
             self.arrow_pick = "UP"
-            
+
         if arcade.key.DOWN in self.keys_pressed:
             if self.arrow_pick == "UP":
                 arcade.play_sound(self.select_sound)
             self.arrow_pick = "DOWN"
-            
+
 
         if self.arrow_pick == "UP":
             self.arrow.center_y = self.arrow_y[0]
@@ -849,7 +871,7 @@ class PauseView(arcade.View):
             anchor_x="center",
             font_name="Minecraft Rus"
         )
-    
+
     def on_key_release(self, key, modifiers):
         if key == arcade.key.ESCAPE:
             self.window.show_view(self.game_view)
