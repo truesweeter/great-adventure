@@ -551,11 +551,22 @@ class GameView(arcade.View):
         self.player_physics = arcade.PhysicsEngineSimple(self.player, self.collision_list)
 
         self.camera = arcade.camera.Camera2D()
-
+        self.ui_camera = arcade.camera.Camera2D()
         self.pick_up_sound = arcade.load_sound("assets/sounds/pick_up.mp3")
         self.nuke_sound = arcade.load_sound("assets/sounds/nuke.mp3")
 
+        skull = arcade.Sprite('assets/kills.png')
+        skull.scale = 1
+        skull.center_x = 20
+        skull.center_y = 60
+        self.all_sprites = arcade.SpriteList()
+        self.all_sprites.append(skull)
 
+        watch = arcade.Sprite('assets/watch.png')
+        watch.scale = 0.12
+        watch.center_x = 20
+        watch.center_y = 20
+        self.all_sprites.append(watch)
     def setup(self):
         self.keys_pressed = set()
         self.timer = 0
@@ -571,8 +582,8 @@ class GameView(arcade.View):
         self.items.draw()
         arcade.draw_text(
             f"Убийства: {self.kill_count}",
-            self.camera.position.x - SCREEN_WIDTH // 2 + 20,
-            self.camera.position.y - SCREEN_HEIGHT // 2 + 40,
+            self.camera.position.x - SCREEN_WIDTH // 2 + 40,
+            self.camera.position.y - SCREEN_HEIGHT // 2 + 50,
             arcade.color.WHITE,
             16,
             font_name="Minecraft Rus"
@@ -580,13 +591,14 @@ class GameView(arcade.View):
 
         arcade.draw_text(
             f"Время: {int(self.time_survived)} c",
-            self.camera.position.x - SCREEN_WIDTH // 2 + 20,
-            self.camera.position.y - SCREEN_HEIGHT // 2 + 20,
+            self.camera.position.x - SCREEN_WIDTH // 2 + 40,
+            self.camera.position.y - SCREEN_HEIGHT // 2 + 10,
             arcade.color.WHITE,
             16,
             font_name="Minecraft Rus"
         )
-
+        self.ui_camera.use()
+        self.all_sprites.draw()
     def on_update(self, delta_time):
         self.time_survived += delta_time
 
