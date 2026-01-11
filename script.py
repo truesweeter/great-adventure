@@ -401,7 +401,8 @@ class EnemyZombie(arcade.Sprite):
         self.scale = 0.8
 
         self.timer = 0
-        self.speed = 350
+        self.speed = 175
+        self.hp = 3
         self.animation_timer = 0
         self.current_texture = 0
         self.walk_animation = [
@@ -620,35 +621,46 @@ class GameView(arcade.View):
                 if not enemy.is_dead:
                     bullet.remove_from_sprite_lists()
                 if not enemy.is_dead:
-                    enemy.is_dead = True
-                    enemy.animation_timer = 0
-                    enemy.current_texture = 0
-                    enemy.texture = enemy.death_animation[0]
-                    # выпадение предметов с жуков
-                    drop = random.choice(
-                        [False, False, False, False, False, False, False, True]  # шанс появления предмета 12,5%
-                    )
-                    # шансы появления
-                    # перец - 33%
-                    # дробовик - 25%
-                    # двойные пистолеты - 17%
-                    # автоматическая стрельба - 17%
-                    # ядерка - 8%
-                    if drop:
-                        items = (
-                            Pepper, Pepper, Pepper, Pepper,
-                            DoubleBarreled, DoubleBarreled, DoubleBarreled,
-                            DoublePistols, DoublePistols,
-                            Autogun, Autogun,
-                            Nuke,
+                    if isinstance(enemy, EnemyBeatle):
+                        enemy.is_dead = True
+                        enemy.animation_timer = 0
+                        enemy.current_texture = 0
+                        enemy.texture = enemy.death_animation[0]
+                    if isinstance(enemy, EnemyZombie):
+                        if enemy.hp > 1:
+                            enemy.hp -= 1
+                        else:
+                            enemy.is_dead = True
+                            enemy.animation_timer = 0
+                            enemy.current_texture = 0
+                            enemy.texture = enemy.death_animation[0]
+                      
+                    # выпадение предметов с врагов
+                    if enemy.is_dead:
+                        drop = random.choice(
+                            [False, False, False, False, False, False, False, True]  # шанс появления предмета 12,5%
                         )
-                        item_name = random.choice(items)
-                        item = item_name()
-                        item.center_x = enemy.center_x
-                        item.center_y = enemy.center_y
-                        self.items.append(item)
-                        if len(self.items) > 2:  # максимум два предмета на карте
-                            self.items[0].remove_from_sprite_lists()
+                        # шансы появления
+                        # перец - 33%
+                        # дробовик - 25%
+                        # двойные пистолеты - 17%
+                        # автоматическая стрельба - 17%
+                        # ядерка - 8%
+                        if drop:
+                            items = (
+                                Pepper, Pepper, Pepper, Pepper,
+                                DoubleBarreled, DoubleBarreled, DoubleBarreled,
+                                DoublePistols, DoublePistols,
+                                Autogun, Autogun,
+                                Nuke,
+                            )
+                            item_name = random.choice(items)
+                            item = item_name()
+                            item.center_x = enemy.center_x
+                            item.center_y = enemy.center_y
+                            self.items.append(item)
+                            if len(self.items) > 2:  # максимум два предмета на карте
+                                self.items[0].remove_from_sprite_lists()
 
         # подбор предмета
         picked_items = arcade.check_for_collision_with_list(self.player, self.items)
