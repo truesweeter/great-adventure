@@ -707,7 +707,7 @@ class GameView(arcade.View):
         hit_list = arcade.check_for_collision_with_list(self.player, self.enemies)
         for enemy in hit_list:
             if not enemy.is_dead:
-                death_view = DeathView()
+                death_view = DeathView(self.kill_count, self.time_survived)
                 self.window.show_view(death_view)
 
         self.center_camera()
@@ -774,8 +774,10 @@ class StartView(arcade.View):
 
 
 class DeathView(arcade.View):
-    def __init__(self):
+    def __init__(self, kills_count, time_survived):
         super().__init__()
+        self.time_survived = time_survived
+        self.kills_count = kills_count
         skull = arcade.Sprite("assets/skull.png")
         skull.center_x = SCREEN_WIDTH / 2
         skull.center_y = SCREEN_HEIGHT / 2 + 100
@@ -789,7 +791,7 @@ class DeathView(arcade.View):
         self.arrow_pick = "UP"
         self.arrow = arcade.Sprite("assets/arrow.png")
         self.arrow.scale = 0.35
-        self.arrow.center_x = SCREEN_WIDTH / 2 - 230
+        self.arrow.center_x = SCREEN_WIDTH / 2 - 30
         self.arrow.center_y = SCREEN_HEIGHT / 2 - 175
         self.all_sprites.append(self.arrow)
 
@@ -808,11 +810,27 @@ class DeathView(arcade.View):
         arcade.draw_text("Вы умерли! Желаете начать заново?", SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 - 100,
                          font_name="Minecraft Rus", font_size=17)
 
-        arcade.draw_text("Да, начать новую игру", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 - 175,
+        arcade.draw_text("Да, начать новую игру", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 175,
                          font_name="Minecraft Rus", font_size=15)
-        arcade.draw_text("Нет, выйти из игры", SCREEN_WIDTH / 2 - 200, SCREEN_HEIGHT / 2 - 225,
+        arcade.draw_text("Нет, выйти из игры", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 225,
                          font_name="Minecraft Rus", font_size=15)
+        arcade.draw_text(
+            f"Убийства: {self.kills_count}",
+            SCREEN_WIDTH // 2 - 250,
+            SCREEN_HEIGHT // 2 - 175,
+            arcade.color.WHITE,
+            15,
+            font_name="Minecraft Rus"
+        )
 
+        arcade.draw_text(
+            f"Время: {int(self.time_survived)} c",
+            SCREEN_WIDTH // 2 - 250,
+            SCREEN_HEIGHT // 2 - 225,
+            arcade.color.WHITE,
+            15,
+            font_name="Minecraft Rus"
+        )
     def on_update(self, delta_time):
         if arcade.key.UP in self.keys_pressed:
             if self.arrow_pick == "DOWN":
