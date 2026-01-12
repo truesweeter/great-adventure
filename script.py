@@ -534,6 +534,7 @@ class GameView(arcade.View):
         arcade.set_background_color(arcade.color.ASH_GREY)
         self.keys_pressed = []
         self.timer = 0
+        self.game_time = 0
         self.kill_count = 0
         self.time_survived = 0.0
         self.player_list = arcade.SpriteList()
@@ -611,12 +612,24 @@ class GameView(arcade.View):
         self.items.update(delta_time)
 
         # спавн врагов
+        self.game_time += delta_time
         self.timer += delta_time
+
+        wave = int(self.game_time // 65)
+
+        if wave == 0:
+            spawn_chance = 0.4
+            zombie_chance = 0.30
+        elif wave == 1:
+            spawn_chance = 0.6
+            zombie_chance = 0.35
+        else:
+            spawn_chance = 0.7
+            zombie_chance = 0.4
+
         if self.timer >= 1:
-            spawn = random.choice([True, False, False, False])  # шанс на спавн 25%
-            if spawn:
-                zombie = random.choice([True, False, False]) # 33%
-                if zombie:
+            if random.random() < spawn_chance:
+                if random.random() < zombie_chance:
                     enemy = EnemyZombie(self.player)
                 else:
                     enemy = EnemyBeatle(self.player)
@@ -630,21 +643,29 @@ class GameView(arcade.View):
                 offset = 50
 
                 if position == 0:
-                    enemy.center_y = random.randint(int(cam_y - SCREEN_HEIGHT / 2), int(cam_y + SCREEN_HEIGHT / 2))
+                    enemy.center_y = random.randint(
+                        int(cam_y - SCREEN_HEIGHT / 2),
+                        int(cam_y + SCREEN_HEIGHT / 2)
+                    )
                     enemy.center_x = random.choice([
                         int(cam_x - SCREEN_WIDTH / 2 - offset),
                         int(cam_x + SCREEN_WIDTH / 2 + offset)
                     ])
                 else:
-                    enemy.center_x = random.randint(int(cam_x - SCREEN_WIDTH / 2), int(cam_x + SCREEN_WIDTH / 2))
+                    enemy.center_x = random.randint(
+                        int(cam_x - SCREEN_WIDTH / 2),
+                        int(cam_x + SCREEN_WIDTH / 2)
+                    )
                     enemy.center_y = random.choice([
                         int(cam_y - SCREEN_HEIGHT / 2 - offset),
                         int(cam_y + SCREEN_HEIGHT / 2 + offset)
                     ])
 
                 self.enemies.append(enemy)
-            else:
-                pass
+
+            self.timer = 0
+
+
 
         # попадение выстрела в жука
         for bullet in self.bullets:
