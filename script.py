@@ -706,6 +706,7 @@ class GameView(arcade.View):
                 for enemy in self.enemies:
                     if enemy.is_dead == False:
                         enemy.is_dead = True
+                        self.kill_count += 1
                         enemy.animation_timer = 0
                         enemy.current_texture = 0
                         enemy.texture = enemy.death_animation[0]
