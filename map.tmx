@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="24" height="24" tilewidth="70" tileheight="70" infinite="0" nextlayerid="8" nextobjectid="1">
- <tileset firstgid="1" source="../great-adventureыыы/ground.tsx"/>
- <tileset firstgid="2" source="../great-adventureыыы/walls.tsx"/>
- <tileset firstgid="3" source="../great-adventureыыы/box.tsx"/>
- <tileset firstgid="4" source="../great-adventureыыы/col.tsx"/>
- <tileset firstgid="5" source="../great-adventureыыы/gate.tsx"/>
+ <tileset firstgid="1" source="ground.tsx"/>
+ <tileset firstgid="2" source="walls.tsx"/>
+ <tileset firstgid="3" source="box.tsx"/>
+ <tileset firstgid="4" source="col.tsx"/>
+ <tileset firstgid="5" source="gate.tsx"/>
  <tileset firstgid="6" source="hero_col.tsx"/>
  <layer id="2" name="ground" width="24" height="24">
   <data encoding="base64" compression="zlib">
