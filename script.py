@@ -546,8 +546,9 @@ class GameView(arcade.View):
         self.items = arcade.SpriteList()
 
         tile_map = arcade.load_tilemap('map.tmx', scaling=0.6)
-        self.wall_list = tile_map.sprite_lists['box']
-        self.ground_list = tile_map.sprite_lists['stone']
+        self.box_list = tile_map.sprite_lists['boxes']
+        self.ground_list = tile_map.sprite_lists['ground']
+        self.walls_list = tile_map.sprite_lists['walls']
         self.collision_list = tile_map.sprite_lists['collision']
         self.player_physics = arcade.PhysicsEngineSimple(self.player, self.collision_list)
 
@@ -576,7 +577,8 @@ class GameView(arcade.View):
         self.clear()
         self.camera.use()
         self.ground_list.draw()
-        self.wall_list.draw()
+        self.walls_list.draw()
+        self.box_list.draw()
         self.enemies.draw()
         self.player_list.draw()
         self.bullets.draw()
@@ -606,7 +608,8 @@ class GameView(arcade.View):
         self.player.update(self.keys_pressed, delta_time, self.bullets)
         self.player_physics.update()
         for enemy in self.enemies:
-            enemy.physics.update()
+            if enemy.__class__ == EnemyZombie:
+                enemy.physics.update()
         self.bullets.update(delta_time)
         self.enemies.update(delta_time)
         self.items.update(delta_time)
@@ -631,11 +634,11 @@ class GameView(arcade.View):
             if random.random() < spawn_chance:
                 if random.random() < zombie_chance:
                     enemy = EnemyZombie(self.player)
+                    enemy.physics = arcade.PhysicsEngineSimple(enemy, self.collision_list)
                 else:
                     enemy = EnemyBeatle(self.player)
 
                 self.timer = 0
-                enemy.physics = arcade.PhysicsEngineSimple(enemy, self.collision_list)
                 position = random.randint(0, 1)
 
                 cam_x = self.camera.position.x

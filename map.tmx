@@ -1,21 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="70" tileheight="70" infinite="0" nextlayerid="5" nextobjectid="1">
- <tileset firstgid="1" source="stone.tsx"/>
- <tileset firstgid="2" source="box.tsx"/>
- <tileset firstgid="3" source="col.tsx"/>
- <layer id="2" name="stone" width="20" height="20">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="24" height="24" tilewidth="70" tileheight="70" infinite="0" nextlayerid="6" nextobjectid="1">
+ <tileset firstgid="1" source="ground.tsx"/>
+ <tileset firstgid="2" source="walls.tsx"/>
+ <tileset firstgid="3" source="box.tsx"/>
+ <tileset firstgid="4" source="col.tsx"/>
+ <layer id="2" name="ground" width="24" height="24">
   <data encoding="base64" compression="zlib">
-   eJxjZGBgYBzFo3gUj+JRPIpJxADrnAGR
+   eJztwwENAAAMw6DOv+kLOSSsmqrqowcuFgJB
   </data>
  </layer>
- <layer id="3" name="box" width="20" height="20">
+ <layer id="3" name="walls" width="24" height="24">
   <data encoding="base64" compression="zlib">
-   eJxjYBgagIlMPTBMDfMI2TUKRsFIB4M9X9Ern+Ire4YTAABVSAAZ
+   eJxjYmBgYCICowNi9ODSSy0wav6o+SPd/FEwsGCop59R80fNH+zm07J9AgC2TgCZ
   </data>
  </layer>
- <layer id="4" name="collision" width="20" height="20" visible="0">
+ <layer id="4" name="boxes" width="24" height="24">
   <data encoding="base64" compression="zlib">
-   eJxjYBgagJlMPTBMDfMI2TUKRsFIB4M9X9Ern+Ire4YTAAB8zAAl
+   eJxjYBgF1ALMUEwrs7GxBzMgxp3k+oUUfUMlvKgBKPErIb3UCEd8ZtDafErtGE1HlKslVd9QCXN6lM+0rF9GKgAATZ8ASQ==
+  </data>
+ </layer>
+ <layer id="5" name="collision" width="24" height="24" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJzNlsEKACAIQz34/9/cPRA33KxBEKZvISRlRCSwbiE1Va1Kv/Gd+Vnslfdh1fER766+Omf7zPIV2uAjsQlPxUYYbv7UQ91vxO8Vf+N9OeeDQr/NZ3c+qy2+839yABSJAZE=
   </data>
  </layer>
 </map>
