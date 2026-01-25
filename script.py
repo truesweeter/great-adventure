@@ -233,14 +233,14 @@ class Hero(arcade.Sprite):
                     bullets.append(a_bullet4)
 
         # не дает пройти персонажу за окно
-        if self.center_x <= 0:
-            self.center_x = 0
-        if self.center_x >= SCREEN_WIDTH:
-            self.center_x = SCREEN_WIDTH
-        if self.center_y <= 0:
-            self.center_y = 0
-        if self.center_y >= SCREEN_HEIGHT:
-            self.center_y = SCREEN_HEIGHT
+        # if self.center_x <= 0:
+        #     self.center_x = 0
+        # if self.center_x >= SCREEN_WIDTH:
+        #     self.center_x = SCREEN_WIDTH
+        # if self.center_y <= 0:
+        #     self.center_y = 0
+        # if self.center_y >= SCREEN_HEIGHT:
+        #     self.center_y = SCREEN_HEIGHT
 
         if moving:
             self.animation_timer += 1
@@ -308,13 +308,13 @@ class Bullet(arcade.Sprite):
         elif self.direction == "down":
             self.center_y -= self.speed * delta_time
 
-        if (
-                self.right < 0 or
-                self.left > SCREEN_WIDTH or
-                self.top < 0 or
-                self.bottom > SCREEN_HEIGHT
-        ):
-            self.remove_from_sprite_lists()
+        # if (
+        #         self.right < 0 or
+        #         self.left > SCREEN_WIDTH or
+        #         self.top < 0 or
+        #         self.bottom > SCREEN_HEIGHT
+        # ):
+        #     self.remove_from_sprite_lists()
 
 
 class EnemyBeatle(arcade.Sprite):
@@ -391,10 +391,10 @@ class EnemyBeatle(arcade.Sprite):
 
 
 class EnemyZombie(arcade.Sprite):
-    def __init__(self, target):
+    def __init__(self, target, collision_list):
         super().__init__()
         self.target = target
-
+        self.collision_list = collision_list
         self.is_dead = False
         self.attack = True
 
@@ -443,6 +443,7 @@ class EnemyZombie(arcade.Sprite):
                 self.center_x += dx * self.speed * delta_time
                 self.center_y += dy * self.speed * delta_time
 
+            self.physics.update()
             self.animation_timer += 1
 
             if self.animation_timer % 8 == 0:
@@ -550,7 +551,10 @@ class GameView(arcade.View):
         self.ground_list = tile_map.sprite_lists['ground']
         self.walls_list = tile_map.sprite_lists['walls']
         self.collision_list = tile_map.sprite_lists['collision']
+        self.gates = tile_map.sprite_lists['gates']
+        self.hero_col = tile_map.sprite_lists['col_hero']
         self.player_physics = arcade.PhysicsEngineSimple(self.player, self.collision_list)
+        self.gate_positions = [(gate.center_x, gate.center_y) for gate in self.gates]
 
         self.camera = arcade.camera.Camera2D()
         self.ui_camera = arcade.camera.Camera2D()
@@ -602,14 +606,12 @@ class GameView(arcade.View):
         )
         self.ui_camera.use()
         self.all_sprites.draw()
+
     def on_update(self, delta_time):
         self.time_survived += delta_time
 
         self.player.update(self.keys_pressed, delta_time, self.bullets)
         self.player_physics.update()
-        for enemy in self.enemies:
-            if enemy.__class__ == EnemyZombie:
-                enemy.physics.update()
         self.bullets.update(delta_time)
         self.enemies.update(delta_time)
         self.items.update(delta_time)
@@ -633,7 +635,7 @@ class GameView(arcade.View):
         if self.timer >= 1:
             if random.random() < spawn_chance:
                 if random.random() < zombie_chance:
-                    enemy = EnemyZombie(self.player)
+                    enemy = EnemyZombie(self.player, self.collision_list)
                     enemy.physics = arcade.PhysicsEngineSimple(enemy, self.collision_list)
                 else:
                     enemy = EnemyBeatle(self.player)
@@ -645,30 +647,34 @@ class GameView(arcade.View):
                 cam_y = self.camera.position.y
                 offset = 50
 
-                if position == 0:
-                    enemy.center_y = random.randint(
-                        int(cam_y - SCREEN_HEIGHT / 2),
-                        int(cam_y + SCREEN_HEIGHT / 2)
-                    )
-                    enemy.center_x = random.choice([
-                        int(cam_x - SCREEN_WIDTH / 2 - offset),
-                        int(cam_x + SCREEN_WIDTH / 2 + offset)
-                    ])
+                if enemy.__class__ == EnemyZombie:
+                    x, y = random.choice(self.gate_positions)
+                    enemy.center_x = x
+                    enemy.center_y = y
+
                 else:
-                    enemy.center_x = random.randint(
-                        int(cam_x - SCREEN_WIDTH / 2),
-                        int(cam_x + SCREEN_WIDTH / 2)
-                    )
-                    enemy.center_y = random.choice([
-                        int(cam_y - SCREEN_HEIGHT / 2 - offset),
-                        int(cam_y + SCREEN_HEIGHT / 2 + offset)
-                    ])
+                    if position == 0:
+                        enemy.center_y = random.randint(
+                            int(cam_y - SCREEN_HEIGHT / 2),
+                            int(cam_y + SCREEN_HEIGHT / 2)
+                        )
+                        enemy.center_x = random.choice([
+                            int(cam_x - SCREEN_WIDTH / 2 - offset),
+                            int(cam_x + SCREEN_WIDTH / 2 + offset)
+                        ])
+                    else:
+                        enemy.center_x = random.randint(
+                            int(cam_x - SCREEN_WIDTH / 2),
+                            int(cam_x + SCREEN_WIDTH / 2)
+                        )
+                        enemy.center_y = random.choice([
+                            int(cam_y - SCREEN_HEIGHT / 2 - offset),
+                            int(cam_y + SCREEN_HEIGHT / 2 + offset)
+                        ])
 
                 self.enemies.append(enemy)
 
             self.timer = 0
-
-
 
         # попадение выстрела в жука
         for bullet in self.bullets:

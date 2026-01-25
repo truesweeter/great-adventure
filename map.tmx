@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="24" height="24" tilewidth="70" tileheight="70" infinite="0" nextlayerid="6" nextobjectid="1">
- <tileset firstgid="1" source="ground.tsx"/>
- <tileset firstgid="2" source="walls.tsx"/>
- <tileset firstgid="3" source="box.tsx"/>
- <tileset firstgid="4" source="col.tsx"/>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="24" height="24" tilewidth="70" tileheight="70" infinite="0" nextlayerid="8" nextobjectid="1">
+ <tileset firstgid="1" source="../great-adventureыыы/ground.tsx"/>
+ <tileset firstgid="2" source="../great-adventureыыы/walls.tsx"/>
+ <tileset firstgid="3" source="../great-adventureыыы/box.tsx"/>
+ <tileset firstgid="4" source="../great-adventureыыы/col.tsx"/>
+ <tileset firstgid="5" source="../great-adventureыыы/gate.tsx"/>
+ <tileset firstgid="6" source="hero_col.tsx"/>
  <layer id="2" name="ground" width="24" height="24">
   <data encoding="base64" compression="zlib">
    eJztwwENAAAMw6DOv+kLOSSsmqrqowcuFgJB
@@ -22,6 +24,16 @@
  <layer id="5" name="collision" width="24" height="24" visible="0">
   <data encoding="base64" compression="zlib">
    eJzNlsEKACAIQz34/9/cPRA33KxBEKZvISRlRCSwbiE1Va1Kv/Gd+Vnslfdh1fER766+Omf7zPIV2uAjsQlPxUYYbv7UQ91vxO8Vf+N9OeeDQr/NZ3c+qy2+839yABSJAZE=
+  </data>
+ </layer>
+ <layer id="6" name="gates" width="24" height="24" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjYCAesELxKBgFo2BkAFrmd1qXJ6Nl1SgYBSMHkFOeAAC9UAAp
+  </data>
+ </layer>
+ <layer id="7" name="col_hero" width="24" height="24" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJxjY2BgYKMxphUYbObTUj0bDjY13UMqIGQ+MXYT0o9LntRwJtV8aoCBMJ8S+7CZRU66I9YOeptPqR2EwofaYCDNp0f+omX5QA0w2MpnWqsnFdDLfFpiAEskArk=
   </data>
  </layer>
 </map>
