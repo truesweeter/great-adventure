@@ -2,6 +2,7 @@ import arcade
 import math
 import random
 import json
+import os
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 720
@@ -880,6 +881,8 @@ class DeathView(arcade.View):
         if self.time_survived > max_time:
             max_time = int(self.time_survived)
 
+        path = "data/records.json"
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         record = {"max_kills": max_kills, "max_time": max_time}    
         with open("data/records.json", mode="w", encoding="utf-8") as f:
             json.dump(record, f, ensure_ascii=False, indent=4)
