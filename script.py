@@ -400,6 +400,8 @@ class EnemyZombie(arcade.Sprite):
 
         self.scale = 0.8
 
+        self.direction = random.choice(["LEFT", "RIGHT"])
+
         self.timer = 0
         self.speed = 175
         self.hp = 3
@@ -431,17 +433,34 @@ class EnemyZombie(arcade.Sprite):
 
     def update(self, delta_time):
         if self.attack:
+            old_x = self.center_x
+            old_y = self.center_y
+
             dx = self.target.center_x - self.center_x
             dy = self.target.center_y - self.center_y
 
             distance = math.hypot(dx, dy)
+            if distance == 0:
+                return
 
-            if distance > 0:
-                dx /= distance
-                dy /= distance
+            dx /= distance
+            dy /= distance
 
-                self.center_x += dx * self.speed * delta_time
-                self.center_y += dy * self.speed * delta_time
+            self.center_x += dx * self.speed * delta_time
+            self.center_y += dy * self.speed * delta_time
+
+            if arcade.check_for_collision_with_list(self, self.collision_list):
+                self.center_x = old_x
+                self.center_y = old_y
+
+                if self.direction == "LEFT":
+                    self.center_x += -dy * self.speed * 2/3 * delta_time
+                    self.center_y += dx * self.speed * 2/3 * delta_time
+                else:
+                    self.center_x += dy * self.speed * 2/3 * delta_time
+                    self.center_y += -dx * self.speed * 2/3 * delta_time
+
+
 
             self.physics.update()
             self.animation_timer += 1
@@ -631,6 +650,7 @@ class GameView(arcade.View):
         else:
             spawn_chance = 0.7
             zombie_chance = 0.4
+        
 
         if self.timer >= 1:
             if random.random() < spawn_chance:
@@ -702,7 +722,7 @@ class GameView(arcade.View):
                     # выпадение предметов с врагов
                     if enemy.is_dead:
                         drop = random.choice(
-                            [False, False, False, False, False, False, False, True]  # шанс появления предмета 12,5%
+                            [False, False, False, False, False, True]  # шанс появления предмета 16%
                         )
                         # шансы появления
                         # перец - 33%
