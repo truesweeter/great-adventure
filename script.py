@@ -1,6 +1,7 @@
 import arcade
 import math
 import random
+import json
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 720
@@ -863,6 +864,25 @@ class DeathView(arcade.View):
         self.select_sound = arcade.load_sound("assets/sounds/select.wav")
         self.start_sound = arcade.load_sound("assets/sounds/start.wav")
         arcade.play_sound(self.death_sound)
+
+        max_kills = 0
+        max_time = 0
+        try: 
+            with open("data/records.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+                max_kills = data["max_kills"]
+                max_time = 0
+        except Exception:
+            max_kills = 0
+            max_time = 0
+        if self.kills_count > max_kills:
+            max_kills = self.kills_count
+        if self.time_survived > max_time:
+            max_time = int(self.time_survived)
+
+        record = {"max_kills": max_kills, "max_time": max_time}    
+        with open("data/records.json", mode="w", encoding="utf-8") as f:
+            json.dump(record, f, ensure_ascii=False, indent=4)
 
 
 
