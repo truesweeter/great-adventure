@@ -866,20 +866,24 @@ class DeathView(arcade.View):
         self.start_sound = arcade.load_sound("assets/sounds/start.wav")
         arcade.play_sound(self.death_sound)
 
+        self.new_record = False
         max_kills = 0
         max_time = 0
         try: 
             with open("data/records.json", "r", encoding="utf-8") as f:
                 data = json.load(f)
                 max_kills = data["max_kills"]
-                max_time = 0
+                max_time = data["max_time"]
         except Exception:
             max_kills = 0
             max_time = 0
+        print(max_kills, max_time)
         if self.kills_count > max_kills:
             max_kills = self.kills_count
+            self.new_record = True
         if self.time_survived > max_time:
             max_time = int(self.time_survived)
+            self.new_record = True
 
         path = "data/records.json"
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -917,6 +921,39 @@ class DeathView(arcade.View):
             15,
             font_name="Minecraft Rus"
         )
+
+        if self.new_record:
+            arcade.draw_text(
+                "НОВЫЙ РЕКОРД",
+                SCREEN_WIDTH / 2 - 122,
+                SCREEN_HEIGHT / 2 + 250,
+                arcade.color.YELLOW,
+                20,
+                font_name="Minecraft Rus"
+            )
+        
+        with open("data/records.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+                max_kills = data["max_kills"]
+                max_time = data["max_time"]
+
+        arcade.draw_text(
+            f"Рекорд убийств: {max_kills}",
+            30,
+            50,
+            arcade.color.WHITE,
+            14,
+            font_name="Minecraft Rus"
+        )
+        arcade.draw_text(
+            f"Рекорд по времени: {max_time} c",
+            30,
+            25,
+            arcade.color.WHITE,
+            14,
+            font_name="Minecraft Rus"
+        )
+
     def on_update(self, delta_time):
         if arcade.key.UP in self.keys_pressed:
             if self.arrow_pick == "DOWN":
@@ -946,7 +983,8 @@ class DeathView(arcade.View):
         self.keys_pressed.append(key)
 
     def on_key_release(self, key, modifiers):
-        self.keys_pressed.remove(key)
+        if key in self.keys_pressed:
+            self.keys_pressed.remove(key)
 
 
 class PauseView(arcade.View):
@@ -979,7 +1017,6 @@ class PauseView(arcade.View):
     def on_key_release(self, key, modifiers):
         if key == arcade.key.ESCAPE:
             self.window.show_view(self.game_view)
-
 
 
 def main():
