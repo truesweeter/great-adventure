@@ -574,7 +574,7 @@ class GameView(arcade.View):
         self.collision_list = tile_map.sprite_lists['collision']
         self.gates = tile_map.sprite_lists['gates']
         self.hero_col = tile_map.sprite_lists['col_hero']
-        self.player_physics = arcade.PhysicsEngineSimple(self.player, self.collision_list)
+        self.player_physics = arcade.PhysicsEngineSimple(self.player, self.hero_col)
         self.gate_positions = [(gate.center_x, gate.center_y) for gate in self.gates]
 
         self.camera = arcade.camera.Camera2D()
