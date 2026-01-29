@@ -8,12 +8,6 @@ import sys
 import shutil
 
 def get_writable_path(filename, subfolder="data"):
-    """
-    Возвращает путь к файлу, в который можно безопасно писать при запуске .exe.
-    - filename: путь к исходному файлу в проекте (относительно скрипта)
-    - subfolder: папка в текущей директории, где будут храниться рабочие файлы
-    """
-    # Папка рядом с .exe или со скриптом
     if getattr(sys, 'frozen', False):
         base_dir = os.path.dirname(sys.executable)
     else:
@@ -23,38 +17,13 @@ def get_writable_path(filename, subfolder="data"):
     os.makedirs(target_dir, exist_ok=True)
 
     target_file = os.path.join(target_dir, os.path.basename(filename))
-
-    # Если запускаем из .exe, копируем оригинальный файл только если его ещё нет
     if getattr(sys, 'frozen', False) and not os.path.exists(target_file):
         try:
             src_file = os.path.join(sys._MEIPASS, filename)
             shutil.copy2(src_file, target_file)
         except Exception as e:
             print(f"Не удалось скопировать {filename} из временной папки: {e}")
-
-    # Если запускаем из скрипта, просто используем локальный файл
     return target_file
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 720
