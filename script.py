@@ -4,7 +4,6 @@ import random
 import json
 import os
 import sys
-
 import shutil
 
 def get_writable_path(filename, subfolder="data"):
