@@ -594,6 +594,12 @@ class GameView(arcade.View):
         watch.center_x = 20
         watch.center_y = 20
         self.all_sprites.append(watch)
+
+        self.soundtrack = arcade.load_sound("assets/sounds/soundtrack.mp3")
+        self.soundtrack_player = None
+        self.soundtrack_started = False
+        self.sound_timer = 0
+
     def setup(self):
         self.keys_pressed = set()
         self.timer = 0
@@ -629,6 +635,16 @@ class GameView(arcade.View):
         self.all_sprites.draw()
 
     def on_update(self, delta_time):
+        if not self.soundtrack_started:
+            self.sound_timer += delta_time
+            if self.sound_timer > 1.5:
+                self.soundtrack_player = self.soundtrack.play(
+                    volume=0.3,
+                    loop=True
+                )
+                self.soundtrack_started = True
+
+
         self.time_survived += delta_time
 
         self.player.update(self.keys_pressed, delta_time, self.bullets)
@@ -773,7 +789,12 @@ class GameView(arcade.View):
         for enemy in hit_list:
             if not enemy.is_dead:
                 death_view = DeathView(self.kill_count, self.time_survived)
+                #стоп музыки
+                if self.soundtrack_player:
+                    self.soundtrack_player.pause()
+                    self.soundtrack_player = None
                 self.window.show_view(death_view)
+        
 
         self.center_camera()
 
@@ -796,6 +817,7 @@ class GameView(arcade.View):
 
         #переход в паузу
         if key == arcade.key.ESCAPE:
+            self.soundtrack_player.pause()
             self.window.show_view(PauseView(self))
 
     def on_hide_view(self):
@@ -806,6 +828,10 @@ class GameView(arcade.View):
             arcade.play_sound(self.nuke_sound)
         else:
             arcade.play_sound(self.pick_up_sound)
+    
+    def on_show_view(self):
+        if self.soundtrack_player:
+            self.soundtrack_player.play()
 
 
 class StartView(arcade.View):
