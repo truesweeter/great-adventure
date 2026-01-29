@@ -3,6 +3,7 @@ import math
 import random
 import json
 import os
+import sys
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 720
@@ -10,6 +11,10 @@ SCREEN_TITLE = "Great Adventure"
 SPRITE_SIZE = 32
 FRAMES = 8
 
+def resource_path(relative_path):
+    if hasattr(sys, "_MEIPASS"):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 class Hero(arcade.Sprite):
     def __init__(self):
@@ -31,31 +36,31 @@ class Hero(arcade.Sprite):
         self.auto_buff_timer = 0
 
         self.walk_down = [
-            arcade.load_texture("assets/hero/down0.png"),
-            arcade.load_texture("assets/hero/down1.png"),
-            arcade.load_texture("assets/hero/down2.png"),
-            arcade.load_texture("assets/hero/down3.png")
+            arcade.load_texture(resource_path("assets/hero/down0.png")),
+            arcade.load_texture(resource_path("assets/hero/down1.png")),
+            arcade.load_texture(resource_path("assets/hero/down2.png")),
+            arcade.load_texture(resource_path("assets/hero/down3.png"))
         ]
 
         self.walk_up = [
-            arcade.load_texture("assets/hero/up0.png"),
-            arcade.load_texture("assets/hero/up1.png"),
-            arcade.load_texture("assets/hero/up2.png"),
-            arcade.load_texture("assets/hero/up3.png")
+            arcade.load_texture(resource_path("assets/hero/up0.png")),
+            arcade.load_texture(resource_path("assets/hero/up1.png")),
+            arcade.load_texture(resource_path("assets/hero/up2.png")),
+            arcade.load_texture(resource_path("assets/hero/up3.png"))
         ]
 
         self.walk_right = [
-            arcade.load_texture("assets/hero/right0.png"),
-            arcade.load_texture("assets/hero/right1.png"),
-            arcade.load_texture("assets/hero/right2.png"),
-            arcade.load_texture("assets/hero/right3.png")
+            arcade.load_texture(resource_path("assets/hero/right0.png")),
+            arcade.load_texture(resource_path("assets/hero/right1.png")),
+            arcade.load_texture(resource_path("assets/hero/right2.png")),
+            arcade.load_texture(resource_path("assets/hero/right3.png"))
         ]
 
         self.walk_left = [
-            arcade.load_texture("assets/hero/left0.png"),
-            arcade.load_texture("assets/hero/left1.png"),
-            arcade.load_texture("assets/hero/left2.png"),
-            arcade.load_texture("assets/hero/left3.png")
+            arcade.load_texture(resource_path("assets/hero/left0.png")),
+            arcade.load_texture(resource_path("assets/hero/left1.png")),
+            arcade.load_texture(resource_path("assets/hero/left2.png")),
+            arcade.load_texture(resource_path("assets/hero/left3.png"))
         ]
 
         self.current_texture = 0
@@ -66,8 +71,8 @@ class Hero(arcade.Sprite):
         self.shoot_timer = 0
         self.shoot_cooldown = 0.5
 
-        self.shot_sound = arcade.load_sound("assets/sounds/shot.wav")
-        self.shot2_sound = arcade.load_sound("assets/sounds/shot2.wav")
+        self.shot_sound = arcade.load_sound(resource_path("assets/sounds/shot.wav"))
+        self.shot2_sound = arcade.load_sound(resource_path("assets/sounds/shot2.wav"))
 
     def get_buff(self, item):
         if item.buff == 'speed':
@@ -296,7 +301,7 @@ class Bullet(arcade.Sprite):
     def __init__(self, direction):
         super().__init__()
 
-        self.texture = arcade.load_texture("assets/bullet.png")
+        self.texture = arcade.load_texture(resource_path("assets/bullet.png"))
         self.direction = direction
         self.speed = 500
 
@@ -332,19 +337,19 @@ class EnemyBeatle(arcade.Sprite):
         self.animation_timer = 0
         self.current_texture = 0
         self.walk_animation = [
-            arcade.load_texture("assets/enemy1/walk0.png"),
-            arcade.load_texture("assets/enemy1/walk1.png"),
-            arcade.load_texture("assets/enemy1/walk2.png"),
-            arcade.load_texture("assets/enemy1/walk3.png")
+            arcade.load_texture(resource_path("assets/enemy1/walk0.png")),
+            arcade.load_texture(resource_path("assets/enemy1/walk1.png")),
+            arcade.load_texture(resource_path("assets/enemy1/walk2.png")),
+            arcade.load_texture(resource_path("assets/enemy1/walk3.png"))
         ]
         self.death_animation = [
-            arcade.load_texture("assets/enemy1/death0.png"),
-            arcade.load_texture("assets/enemy1/death1.png"),
-            arcade.load_texture("assets/enemy1/death2.png"),
-            arcade.load_texture("assets/enemy1/death3.png"),
-            arcade.load_texture("assets/enemy1/death4.png"),
-            arcade.load_texture("assets/enemy1/death5.png"),
-            arcade.load_texture("assets/enemy1/death6.png"),
+            arcade.load_texture(resource_path("assets/enemy1/death0.png")),
+            arcade.load_texture(resource_path("assets/enemy1/death1.png")),
+            arcade.load_texture(resource_path("assets/enemy1/death2.png")),
+            arcade.load_texture(resource_path("assets/enemy1/death3.png")),
+            arcade.load_texture(resource_path("assets/enemy1/death4.png")),
+            arcade.load_texture(resource_path("assets/enemy1/death5.png")),
+            arcade.load_texture(resource_path("assets/enemy1/death6.png")),
         ]
         self.texture = self.walk_animation[0]
 
@@ -410,26 +415,26 @@ class EnemyZombie(arcade.Sprite):
         self.animation_timer = 0
         self.current_texture = 0
         self.walk_animation = [
-            arcade.load_texture("assets/enemy2/walk0.png"),
-            arcade.load_texture("assets/enemy2/walk1.png"),
-            arcade.load_texture("assets/enemy2/walk2.png"),
-            arcade.load_texture("assets/enemy2/walk3.png"),
-            arcade.load_texture("assets/enemy2/walk4.png"),
-            arcade.load_texture("assets/enemy2/walk5.png"),
-            arcade.load_texture("assets/enemy2/walk6.png"),
-            arcade.load_texture("assets/enemy2/walk7.png"),
-            arcade.load_texture("assets/enemy2/walk8.png"),
-            arcade.load_texture("assets/enemy2/walk9.png"),
+            arcade.load_texture(resource_path("assets/enemy2/walk0.png")),
+            arcade.load_texture(resource_path("assets/enemy2/walk1.png")),
+            arcade.load_texture(resource_path("assets/enemy2/walk2.png")),
+            arcade.load_texture(resource_path("assets/enemy2/walk3.png")),
+            arcade.load_texture(resource_path("assets/enemy2/walk4.png")),
+            arcade.load_texture(resource_path("assets/enemy2/walk5.png")),
+            arcade.load_texture(resource_path("assets/enemy2/walk6.png")),
+            arcade.load_texture(resource_path("assets/enemy2/walk7.png")),
+            arcade.load_texture(resource_path("assets/enemy2/walk8.png")),
+            arcade.load_texture(resource_path("assets/enemy2/walk9.png")),
 
         ]
         self.death_animation = [
-            arcade.load_texture("assets/enemy2/death0.png"),
-            arcade.load_texture("assets/enemy2/death1.png"),
-            arcade.load_texture("assets/enemy2/death2.png"),
-            arcade.load_texture("assets/enemy2/death3.png"),
-            arcade.load_texture("assets/enemy2/death4.png"),
-            arcade.load_texture("assets/enemy2/death5.png"),
-            arcade.load_texture("assets/enemy2/death6.png"),
+            arcade.load_texture(resource_path("assets/enemy2/death0.png")),
+            arcade.load_texture(resource_path("assets/enemy2/death1.png")),
+            arcade.load_texture(resource_path("assets/enemy2/death2.png")),
+            arcade.load_texture(resource_path("assets/enemy2/death3.png")),
+            arcade.load_texture(resource_path("assets/enemy2/death4.png")),
+            arcade.load_texture(resource_path("assets/enemy2/death5.png")),
+            arcade.load_texture(resource_path("assets/enemy2/death6.png")),
         ]
         self.texture = self.walk_animation[0]
 
@@ -516,14 +521,14 @@ class Item(arcade.Sprite):
 class Pepper(Item):
     def __init__(self):
         super().__init__()
-        self.texture = arcade.load_texture('assets/items/pepper.png')
+        self.texture = arcade.load_texture(resource_path('assets/items/pepper.png'))
         self.buff = 'speed'
 
 
 class DoubleBarreled(Item):
     def __init__(self):
         super().__init__()
-        self.texture = arcade.load_texture('assets/items/shotgun.png')
+        self.texture = arcade.load_texture(resource_path('assets/items/shotgun.png'))
         self.scale = 1.4
         self.buff = 'double'
 
@@ -531,14 +536,14 @@ class DoubleBarreled(Item):
 class DoublePistols(Item):
     def __init__(self):
         super().__init__()
-        self.texture = arcade.load_texture('assets/items/revolver.png')
+        self.texture = arcade.load_texture(resource_path('assets/items/revolver.png'))
         self.buff = 'shoot_speed'
 
 
 class Nuke(Item):
     def __init__(self):
         super().__init__()
-        self.texture = arcade.load_texture('assets/items/nuke.png')
+        self.texture = arcade.load_texture(resource_path('assets/items/nuke.png'))
         self.buff = 'nuke'
         self.scale = 1
 
@@ -546,7 +551,7 @@ class Nuke(Item):
 class Autogun(Item):
     def __init__(self):
         super().__init__()
-        self.texture = arcade.load_texture('assets/items/auto-shotgun.png')
+        self.texture = arcade.load_texture(resource_path('assets/items/auto-shotgun.png'))
         self.buff = 'auto'
 
 
@@ -579,23 +584,23 @@ class GameView(arcade.View):
 
         self.camera = arcade.camera.Camera2D()
         self.ui_camera = arcade.camera.Camera2D()
-        self.pick_up_sound = arcade.load_sound("assets/sounds/pick_up.mp3")
-        self.nuke_sound = arcade.load_sound("assets/sounds/nuke.mp3")
+        self.pick_up_sound = arcade.load_sound(resource_path("assets/sounds/pick_up.mp3"))
+        self.nuke_sound = arcade.load_sound(resource_path("assets/sounds/nuke.mp3"))
 
-        skull = arcade.Sprite('assets/kills.png')
+        skull = arcade.Sprite(resource_path('assets/kills.png'))
         skull.scale = 1
         skull.center_x = 20
         skull.center_y = 60
         self.all_sprites = arcade.SpriteList()
         self.all_sprites.append(skull)
 
-        watch = arcade.Sprite('assets/watch.png')
+        watch = arcade.Sprite(resource_path('assets/watch.png'))
         watch.scale = 0.12
         watch.center_x = 20
         watch.center_y = 20
         self.all_sprites.append(watch)
 
-        self.soundtrack = arcade.load_sound("assets/sounds/soundtrack.mp3")
+        self.soundtrack = arcade.load_sound(resource_path("assets/sounds/soundtrack.mp3"))
         self.soundtrack_player = None
         self.soundtrack_started = False
         self.sound_timer = 0
@@ -839,14 +844,14 @@ class StartView(arcade.View):
         super().__init__()
         self.keys_pressed = []
         self.logo_list = arcade.SpriteList()
-        logo = arcade.Sprite("assets/logo.png")
+        logo = arcade.Sprite(resource_path("assets/logo.png"))
         logo.scale = 0.3
         self.logo_list.append(logo)
         logo.center_x = SCREEN_WIDTH / 2
         logo.center_y = SCREEN_HEIGHT / 2 + 100
         arcade.set_background_color(arcade.color.BLACK)
 
-        self.start_sound = arcade.load_sound("assets/sounds/start.wav")
+        self.start_sound = arcade.load_sound(resource_path("assets/sounds/start.wav"))
 
     def on_draw(self):
         self.clear()
@@ -869,7 +874,7 @@ class DeathView(arcade.View):
         super().__init__()
         self.time_survived = time_survived
         self.kills_count = kills_count
-        skull = arcade.Sprite("assets/skull.png")
+        skull = arcade.Sprite(resource_path("assets/skull.png"))
         skull.center_x = SCREEN_WIDTH / 2
         skull.center_y = SCREEN_HEIGHT / 2 + 100
         self.all_sprites = arcade.SpriteList()
@@ -880,23 +885,23 @@ class DeathView(arcade.View):
         # cтрелка выбора
         self.arrow_y = [SCREEN_HEIGHT / 2 - 170, SCREEN_HEIGHT / 2 - 220]
         self.arrow_pick = "UP"
-        self.arrow = arcade.Sprite("assets/arrow.png")
+        self.arrow = arcade.Sprite(resource_path("assets/arrow.png"))
         self.arrow.scale = 0.35
         self.arrow.center_x = SCREEN_WIDTH / 2 - 30
         self.arrow.center_y = SCREEN_HEIGHT / 2 - 175
         self.all_sprites.append(self.arrow)
 
         self.ui_camera = arcade.camera.Camera2D()
-        self.death_sound = arcade.load_sound("assets/sounds/lose.wav")
-        self.select_sound = arcade.load_sound("assets/sounds/select.wav")
-        self.start_sound = arcade.load_sound("assets/sounds/start.wav")
+        self.death_sound = arcade.load_sound(resource_path("assets/sounds/lose.wav"))
+        self.select_sound = arcade.load_sound(resource_path("assets/sounds/select.wav"))
+        self.start_sound = arcade.load_sound(resource_path("assets/sounds/start.wav"))
         arcade.play_sound(self.death_sound)
 
         self.new_record = False
         max_kills = 0
         max_time = 0
         try: 
-            with open("data/records.json", "r", encoding="utf-8") as f:
+            with open(resource_path("data/records.json"), "r", encoding="utf-8") as f:
                 data = json.load(f)
                 max_kills = data["max_kills"]
                 max_time = data["max_time"]
@@ -911,10 +916,10 @@ class DeathView(arcade.View):
             max_time = int(self.time_survived)
             self.new_record = True
 
-        path = "data/records.json"
+        path = resource_path("data/records.json")
         os.makedirs(os.path.dirname(path), exist_ok=True)
         record = {"max_kills": max_kills, "max_time": max_time}    
-        with open("data/records.json", mode="w", encoding="utf-8") as f:
+        with open(resource_path("data/records.json"), mode="w", encoding="utf-8") as f:
             json.dump(record, f, ensure_ascii=False, indent=4)
 
 
@@ -958,7 +963,7 @@ class DeathView(arcade.View):
                 font_name="Minecraft Rus"
             )
         
-        with open("data/records.json", "r", encoding="utf-8") as f:
+        with open(resource_path("data/records.json"), "r", encoding="utf-8") as f:
                 data = json.load(f)
                 max_kills = data["max_kills"]
                 max_time = data["max_time"]
@@ -1049,7 +1054,7 @@ def main():
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     start_view = StartView()
     window.show_view(start_view)
-    arcade.load_font("assets/fonts/PixelFont.ttf")
+    arcade.load_font(resource_path("assets/fonts/PixelFont.ttf"))
     arcade.run()
 
 
