@@ -5,6 +5,57 @@ import json
 import os
 import sys
 
+import shutil
+
+def get_writable_path(filename, subfolder="data"):
+    """
+    Возвращает путь к файлу, в который можно безопасно писать при запуске .exe.
+    - filename: путь к исходному файлу в проекте (относительно скрипта)
+    - subfolder: папка в текущей директории, где будут храниться рабочие файлы
+    """
+    # Папка рядом с .exe или со скриптом
+    if getattr(sys, 'frozen', False):
+        base_dir = os.path.dirname(sys.executable)
+    else:
+        base_dir = os.path.abspath(".")
+
+    target_dir = os.path.join(base_dir, subfolder)
+    os.makedirs(target_dir, exist_ok=True)
+
+    target_file = os.path.join(target_dir, os.path.basename(filename))
+
+    # Если запускаем из .exe, копируем оригинальный файл только если его ещё нет
+    if getattr(sys, 'frozen', False) and not os.path.exists(target_file):
+        try:
+            src_file = os.path.join(sys._MEIPASS, filename)
+            shutil.copy2(src_file, target_file)
+        except Exception as e:
+            print(f"Не удалось скопировать {filename} из временной папки: {e}")
+
+    # Если запускаем из скрипта, просто используем локальный файл
+    return target_file
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 720
 SCREEN_TITLE = "Great Adventure"
@@ -572,7 +623,7 @@ class GameView(arcade.View):
         self.enemies = arcade.SpriteList()
         self.items = arcade.SpriteList()
 
-        tile_map = arcade.load_tilemap('map.tmx', scaling=0.6)
+        tile_map = arcade.load_tilemap(resource_path('map.tmx'), scaling=0.6)
         self.box_list = tile_map.sprite_lists['boxes']
         self.ground_list = tile_map.sprite_lists['ground']
         self.walls_list = tile_map.sprite_lists['walls']
@@ -900,8 +951,8 @@ class DeathView(arcade.View):
         self.new_record = False
         max_kills = 0
         max_time = 0
-        try: 
-            with open(resource_path("data/records.json"), "r", encoding="utf-8") as f:
+        try:
+            with open(get_writable_path("data/records.json"), "r", encoding="utf-8") as f:
                 data = json.load(f)
                 max_kills = data["max_kills"]
                 max_time = data["max_time"]
@@ -916,10 +967,10 @@ class DeathView(arcade.View):
             max_time = int(self.time_survived)
             self.new_record = True
 
-        path = resource_path("data/records.json")
+        path = get_writable_path("data/records.json")
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        record = {"max_kills": max_kills, "max_time": max_time}    
-        with open(resource_path("data/records.json"), mode="w", encoding="utf-8") as f:
+        record = {"max_kills": max_kills, "max_time": max_time}
+        with open(get_writable_path("data/records.json"), mode="w", encoding="utf-8") as f:
             json.dump(record, f, ensure_ascii=False, indent=4)
 
 
@@ -963,7 +1014,7 @@ class DeathView(arcade.View):
                 font_name="Minecraft Rus"
             )
         
-        with open(resource_path("data/records.json"), "r", encoding="utf-8") as f:
+        with open(get_writable_path("data/records.json"), "r", encoding="utf-8") as f:
                 data = json.load(f)
                 max_kills = data["max_kills"]
                 max_time = data["max_time"]
