@@ -59,12 +59,16 @@ class Hero(arcade.Sprite):
         self.shoot_timer = 0
         self.shoot_cooldown = 0.5
 
-        self.shot_sound = arcade.load_sound(resource_path("assets/sounds/shot.wav"))
-        self.shot2_sound = arcade.load_sound(resource_path("assets/sounds/shot2.wav"))
+        self.shot_sound = arcade.load_sound(
+            resource_path("assets/sounds/shot.wav")
+        )
+        self.shot2_sound = arcade.load_sound(
+            resource_path("assets/sounds/shot2.wav")
+        )
 
     def get_buff(self, item):
         if item.buff == 'speed':
-            self.speed = 275  # увеличение скорости игрока до 275
+            self.speed = 275
             self.speed_buff_timer = 8
         if item.buff == 'double':
             self.double_barreled = True

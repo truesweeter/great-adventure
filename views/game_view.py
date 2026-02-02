@@ -34,13 +34,19 @@ class GameView(arcade.View):
         self.collision_list = tile_map.sprite_lists['collision']
         self.gates = tile_map.sprite_lists['gates']
         self.hero_col = tile_map.sprite_lists['col_hero']
-        self.player_physics = arcade.PhysicsEngineSimple(self.player, self.hero_col)
-        self.gate_positions = [(gate.center_x, gate.center_y) for gate in self.gates]
+        self.player_physics = arcade.PhysicsEngineSimple(self.player,
+                                                         self.hero_col)
+        self.gate_positions = [(gate.center_x, gate.center_y)
+                               for gate in self.gates]
 
         self.camera = arcade.camera.Camera2D()
         self.ui_camera = arcade.camera.Camera2D()
-        self.pick_up_sound = arcade.load_sound(resource_path("assets/sounds/pick_up.mp3"))
-        self.nuke_sound = arcade.load_sound(resource_path("assets/sounds/nuke.mp3"))
+        self.pick_up_sound = arcade.load_sound(
+            resource_path("assets/sounds/pick_up.mp3")
+        )
+        self.nuke_sound = arcade.load_sound(
+            resource_path("assets/sounds/nuke.mp3")
+        )
 
         skull = arcade.Sprite(resource_path('assets/kills.png'))
         skull.scale = 1
@@ -55,7 +61,9 @@ class GameView(arcade.View):
         watch.center_y = 20
         self.all_sprites.append(watch)
 
-        self.soundtrack = arcade.load_sound(resource_path("assets/sounds/soundtrack.mp3"))
+        self.soundtrack = arcade.load_sound(
+            resource_path("assets/sounds/soundtrack.mp3")
+        )
         self.soundtrack_player = None
         self.soundtrack_started = False
         self.sound_timer = 0
@@ -104,7 +112,6 @@ class GameView(arcade.View):
                 )
                 self.soundtrack_started = True
 
-
         self.time_survived += delta_time
 
         self.player.update(self.keys_pressed, delta_time, self.bullets)
@@ -113,7 +120,6 @@ class GameView(arcade.View):
         self.enemies.update(delta_time)
         self.items.update(delta_time)
 
-        # спавн врагов
         self.game_time += delta_time
         self.timer += delta_time
 
@@ -128,13 +134,13 @@ class GameView(arcade.View):
         else:
             spawn_chance = 0.7
             zombie_chance = 0.4
-        
 
         if self.timer >= 1:
             if random.random() < spawn_chance:
                 if random.random() < zombie_chance:
                     enemy = EnemyZombie(self.player, self.collision_list)
-                    enemy.physics = arcade.PhysicsEngineSimple(enemy, self.collision_list)
+                    enemy.physics = arcade.PhysicsEngineSimple(
+                        enemy, self.collision_list)
                 else:
                     enemy = EnemyBeatle(self.player)
 
@@ -174,9 +180,9 @@ class GameView(arcade.View):
 
             self.timer = 0
 
-        # попадение выстрела в жука
         for bullet in self.bullets:
-            hit_list = arcade.check_for_collision_with_list(bullet, self.enemies)
+            hit_list = arcade.check_for_collision_with_list(bullet,
+                                                            self.enemies)
             for enemy in hit_list:
                 if not enemy.is_dead:
                     bullet.remove_from_sprite_lists()
@@ -197,17 +203,10 @@ class GameView(arcade.View):
                             enemy.current_texture = 0
                             enemy.texture = enemy.death_animation[0]
 
-                    # выпадение предметов с врагов
                     if enemy.is_dead:
                         drop = random.choice(
-                            [False, False, False, False, False, True]  # шанс появления предмета 16%
+                            [False, False, False, False, False, True]
                         )
-                        # шансы появления
-                        # перец - 33%
-                        # дробовик - 25%
-                        # двойные пистолеты - 17%
-                        # автоматическая стрельба - 17%
-                        # ядерка - 8%
                         if drop:
                             items = (
                                 Pepper, Pepper, Pepper, Pepper,
@@ -221,40 +220,38 @@ class GameView(arcade.View):
                             item.center_x = enemy.center_x
                             item.center_y = enemy.center_y
                             self.items.append(item)
-                            if len(self.items) > 2:  # максимум два предмета на карте
+                            if len(self.items) > 2:
                                 self.items[0].remove_from_sprite_lists()
 
-        # подбор предмета
-        picked_items = arcade.check_for_collision_with_list(self.player, self.items)
+        picked_items = arcade.check_for_collision_with_list(self.player,
+                                                            self.items)
         for item in picked_items:
             item.remove_from_sprite_lists()
             self.play_pick_up_sound(item)
             self.player.get_buff(item)
-            if item.buff == 'nuke':  # подбор игроком ядерки
+            if item.buff == 'nuke':
                 for enemy in self.enemies:
-                    if enemy.is_dead == False:
+                    if not enemy.is_dead:
                         enemy.is_dead = True
                         self.kill_count += 1
                         enemy.animation_timer = 0
                         enemy.current_texture = 0
                         enemy.texture = enemy.death_animation[0]
 
-        # попадание пули в стену
         for bullet in self.bullets:
-            if arcade.check_for_collision_with_list(bullet, self.collision_list):
+            if arcade.check_for_collision_with_list(bullet,
+                                                    self.collision_list):
                 bullet.remove_from_sprite_lists()
 
-        # смерть героя
-        hit_list = arcade.check_for_collision_with_list(self.player, self.enemies)
+        hit_list = arcade.check_for_collision_with_list(self.player,
+                                                        self.enemies)
         for enemy in hit_list:
             if not enemy.is_dead:
                 death_view = DeathView(self.kill_count, self.time_survived)
-                #стоп музыки
                 if self.soundtrack_player:
                     self.soundtrack_player.pause()
                     self.soundtrack_player = None
                 self.window.show_view(death_view)
-        
 
         self.center_camera()
 
@@ -275,7 +272,6 @@ class GameView(arcade.View):
         if key in self.keys_pressed:
             self.keys_pressed.remove(key)
 
-        #переход в паузу
         if key == arcade.key.ESCAPE:
             self.soundtrack_player.pause()
             self.window.show_view(PauseView(self))

@@ -19,7 +19,6 @@ class DeathView(arcade.View):
         arcade.set_background_color(arcade.color.GRAY_BLUE)
         self.keys_pressed = []
 
-        # cтрелка выбора
         self.arrow_y = [SCREEN_HEIGHT / 2 - 170, SCREEN_HEIGHT / 2 - 220]
         self.arrow_pick = "UP"
         self.arrow = arcade.Sprite(resource_path("assets/arrow.png"))
@@ -29,16 +28,23 @@ class DeathView(arcade.View):
         self.all_sprites.append(self.arrow)
 
         self.ui_camera = arcade.camera.Camera2D()
-        self.death_sound = arcade.load_sound(resource_path("assets/sounds/lose.wav"))
-        self.select_sound = arcade.load_sound(resource_path("assets/sounds/select.wav"))
-        self.start_sound = arcade.load_sound(resource_path("assets/sounds/start.wav"))
+        self.death_sound = arcade.load_sound(
+            resource_path("assets/sounds/lose.wav")
+        )
+        self.select_sound = arcade.load_sound(
+            resource_path("assets/sounds/select.wav")
+        )
+        self.start_sound = arcade.load_sound(
+            resource_path("assets/sounds/start.wav")
+        )
         arcade.play_sound(self.death_sound)
 
         self.new_record = False
         max_kills = 0
         max_time = 0
         try:
-            with open(get_writable_path("data/records.json"), "r", encoding="utf-8") as f:
+            with open(get_writable_path("data/records.json"),
+                      "r", encoding="utf-8") as f:
                 data = json.load(f)
                 max_kills = data["max_kills"]
                 max_time = data["max_time"]
@@ -56,21 +62,23 @@ class DeathView(arcade.View):
         path = get_writable_path("data/records.json")
         os.makedirs(os.path.dirname(path), exist_ok=True)
         record = {"max_kills": max_kills, "max_time": max_time}
-        with open(get_writable_path("data/records.json"), mode="w", encoding="utf-8") as f:
+        with open(get_writable_path("data/records.json"),
+                  mode="w", encoding="utf-8") as f:
             json.dump(record, f, ensure_ascii=False, indent=4)
-
-
 
     def on_draw(self):
         self.clear()
         self.ui_camera.use()
         self.all_sprites.draw()
-        arcade.draw_text("Вы умерли! Желаете начать заново?", SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 - 100,
+        arcade.draw_text("Вы умерли! Желаете начать заново?",
+                         SCREEN_WIDTH / 2 - 250, SCREEN_HEIGHT / 2 - 100,
                          font_name="Minecraft Rus", font_size=17)
 
-        arcade.draw_text("Да, начать новую игру", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 175,
+        arcade.draw_text("Да, начать новую игру", SCREEN_WIDTH / 2,
+                         SCREEN_HEIGHT / 2 - 175,
                          font_name="Minecraft Rus", font_size=15)
-        arcade.draw_text("Нет, выйти из игры", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 225,
+        arcade.draw_text("Нет, выйти из игры", SCREEN_WIDTH / 2,
+                         SCREEN_HEIGHT / 2 - 225,
                          font_name="Minecraft Rus", font_size=15)
         arcade.draw_text(
             f"Убийства: {self.kills_count}",
@@ -99,11 +107,12 @@ class DeathView(arcade.View):
                 20,
                 font_name="Minecraft Rus"
             )
-        
-        with open(get_writable_path("data/records.json"), "r", encoding="utf-8") as f:
-                data = json.load(f)
-                max_kills = data["max_kills"]
-                max_time = data["max_time"]
+
+        with open(get_writable_path("data/records.json"),
+                  "r", encoding="utf-8") as f:
+            data = json.load(f)
+            max_kills = data["max_kills"]
+            max_time = data["max_time"]
 
         arcade.draw_text(
             f"Рекорд убийств: {max_kills}",
@@ -132,7 +141,6 @@ class DeathView(arcade.View):
             if self.arrow_pick == "UP":
                 arcade.play_sound(self.select_sound)
             self.arrow_pick = "DOWN"
-
 
         if self.arrow_pick == "UP":
             self.arrow.center_y = self.arrow_y[0]

@@ -15,7 +15,8 @@ class PauseView(arcade.View):
         self.keys_pressed = set()
 
         arcade.draw_rect_filled(
-            arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT),
+            arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                             SCREEN_WIDTH, SCREEN_HEIGHT),
             (0, 0, 0, 160)
         )
 
